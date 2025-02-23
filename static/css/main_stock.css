@@ -1,0 +1,125 @@
+body{
+    background-color: #EAEAEA;
+}
+@media screen and (max-width:800px){
+    .upnavbar{
+        position: fixed;
+        top : 0;
+        width: 100%;
+        max-width: 96%; /* 좌우 여백을 살짝 남김 */
+        height: auto;
+        line-height: 7vh;
+        display: flex; /*가로정렬*/
+        justify-content: space-between;
+        align-items: center;
+        background-color: white;
+        box-shadow:  rgba(0, 0, 0, 0.25) 0px 7px 29px 0px;
+        border-radius: 0 0 10px 10px;
+        z-index: 100;
+    }
+    .navbar-username {
+        padding-right: 5%;
+    }
+    .downnavbar{
+        position: fixed;
+        bottom: 0;
+        width: 96%;
+        display: flex; /*가로정렬*/
+        justify-content: center;
+        background-color: white;
+        box-shadow:  rgba(0, 0, 0, 0.25) 0px -7px 29px 0px;
+        border-radius: 10px 10px 0 0;
+        z-index: 1000;
+    }
+    .logo{
+        width: 50px;  
+        height: 60px;
+        margin: 0px 20px;
+        background-image: url("/static/images/semicolon logo.png"); 
+        background-size: contain;  /* 로고 이미지 크기 조절 */
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+    .ranking_icon{
+        width: 50px;  
+        height: 50px;
+        margin: 5px 20px;
+        background-image: url("/static/images/ranking_icon.png"); 
+        background-size: contain;  /* 로고 이미지 크기 조절 */
+        background-repeat: no-repeat;
+        background-position: center;
+        display: inline-block;
+        border-radius: 0;
+        cursor: pointer;
+        border: none;  /* 버튼 테두리 제거 */
+        background-color: transparent; /* 배경색 제거 */
+    }
+    .home_icon{
+        width: 50px;  
+        height: 50px;
+        margin: 5px 20px;
+        background-image: url("/static/images/home_icon.png"); 
+        background-size: contain;  /* 로고 이미지 크기 조절 */
+        background-repeat: no-repeat;
+        background-position: center;
+        display: inline-block;
+        border-radius: 0;
+        cursor: pointer;
+        border: none;  /* 버튼 테두리 제거 */
+        background-color: transparent; /* 배경색 제거 */
+    }
+    .wallet_icon{
+        width: 50px;  
+        height: 50px;
+        margin: 5px 20px;
+        background-image: url("/static/images/wallet_icon.png"); 
+        background-size: contain;  /* 로고 이미지 크기 조절 */
+        background-repeat: no-repeat;
+        background-position: center;
+        display: inline-block;
+        border-radius: 0;
+        cursor: pointer;
+        border: none;  /* 버튼 테두리 제거 */
+        background-color: transparent; /* 배경색 제거 */
+    }
+    section {
+        display: flex;            
+        align-items: center;      /* 세로 가운데 정렬 */
+        justify-content: flex-start;  /* 왼쪽 정렬 */
+        border-radius: 10px;
+        background-color: white;
+        padding: 5%;
+        width: 90%; /* 원하는 크기로 조정 */
+        height: auto;
+        box-shadow:  rgba(0, 0, 0, 0.25) 0px -7px 29px 0px;
+        flex-wrap: wrap; /*반응형*/
+    }
+    .chart {
+        margin: auto;
+        min-width: 100px;
+        height: 100px;
+        background: lightgray; /* 차트 자리 표시용 */
+        border-radius: 10px;
+    }
+    
+    .club_logo {
+        width: 70px;
+        height: 70px;
+        margin-right: 20px;  /* 이미지와 텍스트 사이 간격 */
+        background-image: url("/static/images/semicolon logo.png");
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+    
+    .buy_bt{
+        background-color: #0089ED;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 7px 20px;
+        margin-left: auto; /* 버튼을 오른쪽으로 이동 */
+        cursor: pointer;
+    }
+    
+}

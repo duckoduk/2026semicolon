@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stockolon {{username}}</title>
+    <!-- <link rel="stylesheet" href="static/css/buy_stock.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/buy_stock.css') }}">
+</head>
+<body>
+
+    <nav class="upnavbar">
+        <div class="logo"></div>
+        <p style = 'margin: 0px 0px'><span style="color: #A6F4BC;">S</span>TOC<span style="color: #A6F4BC;">K</span>OLON!</p>    
+        <div class='navbar-username'>
+            {{username}}
+        </div>        
+    </nav>
+    <br><br><br>
+    <div class="container">
+        <div class="details">
+            <div class="club_logo"></div>
+            <div class="info">
+                <h1>semicolon</h1>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <div class="tags1" >
+                        <p style="margin: 0px 0px 0px 0px;">#코딩</p>
+                        <p style="margin: 0px 0px 0px 0px;">#파이썬</p>
+                    </div>
+                    <div class="tags2">
+                        <p style="margin: 0px 0px 0px 0px;">#웹개발</p>
+                        <p style="margin: 0px 0px 0px 0px;">#협업 프로젝트</p>
+                    </div>
+                </div>
+                <p>반갑습니다! 운정고등학교 코딩동아리, 세미콜론 입니다!</p>
+            </div>
+        </div>
+        <div class="price" style="display: flex; gap: 20px; height: auto;">
+            <p>19000</p>
+            <p style="color: green;">+0.05%</p> 
+        </div><!-- SAMPLE -->
+        <div class="gain,lose" style="display: flex;">
+            <div class="gain_box" style="border: solid black 1px;">gain</div>
+            <div class="lost-box" style="border: solid black 1px;">lose</div>
+        </div> <!-- 폐기가능성 있음 -->
+        <div class="chart">chart</div>
+        <div class="buy_container">buy
+            <form action="/buy_stock" method="post">
+                <input type="hidden" name="club" value="{{ club }}">
+                <input type="number" name="amount" placeholder="구매할 주식 수량">
+                <form action="/stock" method="get"><button type="submit" class="buy_bt">구매</button></form>
+                
+                <p>{{ message }}</p>
+        </div>
+        <div class="poster">poster</div>
+    </div>
+    <nav class="downnavbar">
+        <div class="ranking_icon"></div>
+        <form action="/home"><button type="submit" class="home_icon"></button></form>
+        <form action="/stock" method="get"><button type="submit" class="wallet_icon"></button></form>
+    </nav>
+</body>
+</html>
