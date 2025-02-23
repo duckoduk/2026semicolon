@@ -4,6 +4,11 @@ import os
 import bcrypt
 import json
 import csv
+from apscheduler.schedulers.background import BackgroundScheduler
+import random
+import pandas as pd
+from sqlalchemy import create_engine
+from datetime import datetime
 
 #비밀번호 암호화해서 저장
 #근뎅 bcrypt첨 해봐서 뭔지 잘 모르겟엉
@@ -22,6 +27,39 @@ app.secret_key="secret_key"
 SUPABASE_URL="https://lwjodduasieisebkrusp.supabase.co"
 SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3am9kZHVhc2llaXNlYmtydXNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg2NDA0NjMsImV4cCI6MjA1NDIxNjQ2M30.3HaCNzho2G-mCYScAKVI2XuF4U24fSJqiVhEQZOtr4I"
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+def update_stock_prices():
+    """🔄 10초마다 주식 가격 업데이트"""
+    # 📥 Supabase에서 현재 데이터 가져오기
+    response = supabase.table("stock_data").select("*").execute()
+    records = response.data
+
+    if not records:
+        print("⚠️ 테이블에 데이터가 없습니다.")
+        return
+
+    # DataFrame 변환
+    df = pd.DataFrame(records)
+
+    # ✅ 가격 변동 적용 (-2000 ~ +2000)
+    for col in df.columns[2:]:  # id, timestamp 제외
+        df[col] = df[col].apply(lambda x: max(x + random.randint(-2000, 2000), 1000))
+
+    # ✅ timestamp 업데이트
+    df["timestamp"] = datetime.now().isoformat()
+
+    # 🔄 Supabase에 업데이트 적용
+    for _, row in df.iterrows():
+        supabase.table("stock_data").update(row.to_dict()).eq("id", row["id"]).execute()
+
+    print(f"✅ [{datetime.now()}] 주식 가격 업데이트 완료!")
+
+# 🕒 스케줄러 설정: 10초마다 실행
+scheduler = BackgroundScheduler()
+scheduler.add_job(update_stock_prices, "interval", seconds=10)
+scheduler.start()
+
+
 
 @app.route('/')
 def index():
@@ -154,8 +192,8 @@ def process_buy_stock():
     except ValueError:
         return "구매 수량은 숫자여야 합니다.", 400
 
-    # recent_stock_data 테이블에서 최신 주식 가격 조회
-    response = supabase.table('recent_stock_data') \
+    # stock_data 테이블에서 최신 주식 가격 조회
+    response = supabase.table('stock_data') \
                        .select("*") \
                        .order("timestamp", desc=True) \
                        .limit(1) \
@@ -226,7 +264,7 @@ def buy_stock(club):
     balance = supabase.table('user_data').select('balance').eq('user_id', session['user_id']).execute() #user_data 테이블의 balance 열 중 user_id가 session['user_id']인 행을 가져옴
     clubs=['세미콜론','실험의숲','그레이스','뉴턴','다독다독','데이터무제한','디세뇨','디아리오','메시스트','빌리네어','소솜','심쿵','아리솔','에스쿱','에어로테크','엘리제','온에어','티아','파라미터','피지카스트로','하람','늘품','세븐일레븐','매드매쓰','도담','데카르트','수학에복종','아페토','메이키스','폴리머','라온제나','리사','아스클레오피스','수북수북','아이티아이','럭스','쿠데타','헥사곤','개벽','혜윰']
     # 최근 데이터를 timestamp를 기준으로 내림차순 정렬하여 첫 번째 row만 가져옵니다.
-    response = supabase.table('recent_stock_data') \
+    response = supabase.table('stock_data') \
         .select("*") \
         .order("timestamp", desc=True) \
         .limit(1) \
