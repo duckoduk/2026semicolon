@@ -4,18 +4,21 @@ body{
     padding-top: 50px;
 }
 @media screen and (max-width:800px){
-    .upnavbar{
+    .upnavbar {
         position: fixed;
-        top : 0;
-        width: 100%;
-        max-width: 96%; /* 좌우 여백을 살짝 남김 */
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%; /* 전체 너비 확보 */
+        max-width: 1200px; /* 최대 너비 제한 */
+        padding: 0 18%; /* 좌우 여백 추가 */
         height: auto;
         line-height: 7vh;
-        display: flex; /*가로정렬*/
+        display: flex;
         justify-content: space-between;
         align-items: center;
         background-color: white;
-        box-shadow:  rgba(0, 0, 0, 0.25) 0px 7px 29px 0px;
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 7px 29px 0px;
         border-radius: 0 0 10px 10px;
         z-index: 100;
     }
