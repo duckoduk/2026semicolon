@@ -173,11 +173,12 @@ def home():
 
 def get_description_by_club(club_name):
     # CSV 파일 경로와 인코딩(UTF-8)을 확인합니다.
-    with open('static\Club_detail_rows.csv', encoding='utf-8') as csvfile:
+    with open('static/Club_detail_rows.csv', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             if row['club_name'] == club_name:
-                return row['description']
+                # description을 쉼표로 분리한 후, 각 항목 앞에 '#' 추가
+                return [f"#{desc.strip()}" for desc in row['description'].split(',')]
     return None
 
 @app.route('/buy_stock', methods=['POST'])

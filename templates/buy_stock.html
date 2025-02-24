@@ -21,22 +21,22 @@
         <div class="details">
             <div class="club_logo"></div>
             <div class="info">
-                <h1>semicolon</h1>
+                <h1>{{ club }}</h1>
                 <div style="display: flex; align-items: center; gap: 20px;">
                     <div class="tags1" >
-                        <p style="margin: 0px 0px 0px 0px;">#코딩</p>
-                        <p style="margin: 0px 0px 0px 0px;">#파이썬</p>
+                        <p style="margin: 0px 0px 0px 0px;">{{ description[0] }}</p>
+                        <p style="margin: 0px 0px 0px 0px;">{{ description[1] }}</p>
                     </div>
                     <div class="tags2">
-                        <p style="margin: 0px 0px 0px 0px;">#웹개발</p>
-                        <p style="margin: 0px 0px 0px 0px;">#협업 프로젝트</p>
+                        <p style="margin: 0px 0px 0px 0px;">{{ description[2] }}</p>
+                        <p style="margin: 0px 0px 0px 0px;">{{ description[3] }}</p>
                     </div>
                 </div>
-                <p>반갑습니다! 운정고등학교 코딩동아리, 세미콜론 입니다!</p>
+                <p>동아리 설명 아직 연결 안함</p>
             </div>
         </div>
         <div class="price" style="display: flex; gap: 20px; height: auto;">
-            <p>19000</p>
+            <span id="stock_value">{{ stock_value }}</span>
             <p style="color: green;">+0.05%</p> 
         </div><!-- SAMPLE -->
         <div class="gain,lose" style="display: flex;">
@@ -44,13 +44,29 @@
             <div class="lost-box" style="border: solid black 1px;">lose</div>
         </div> <!-- 폐기가능성 있음 -->
         <div class="chart">chart</div>
-        <div class="buy_container">buy
-            <form action="/buy_stock" method="post">
-                <input type="hidden" name="club" value="{{ club }}">
-                <input type="number" name="amount" placeholder="구매할 주식 수량">
-                <form action="/stock" method="get"><button type="submit" class="buy_bt">구매</button></form>
+        <div class="buy_container">
+            <div class="balance"><p>보유 자금: {{ "{:,}".format(balance|int) }}</p></div>
+            <div class="purchase-section">
+                <form action="/buy_stock" method="post">
+                    <input type="hidden" name="club" value="{{ club }}">
+                    <input type="number" id="amountInput" name="amount" class="quantity-input" min="1" oninput="calculate()" placeholder="수량 입력">
+                    <button type="submit" class="buy_bt">구매</button>
+                    <script>
+                        function calculate() {
+                            const stock_value = parseFloat(document.getElementById("stock_value").textContent); // app.py에서 받은 값
+                            const amount = parseFloat(document.getElementById("amountInput").value); // 입력값
                 
-                <p>{{ message }}</p>
+                            if (!isNaN(stock_value) && !isNaN(amount)) {
+                                const result = stock_value * amount;
+                                document.getElementById("result").textContent = result.toLocaleString(); // 결과 표시
+                            } else {
+                                document.getElementById("result").textContent = "올바른 숫자를 입력하세요!";
+                            }
+                        }
+                    </script>
+                    <p><strong>총액:</strong> <span id="result">0</span></p> <!-- 총액 표시 영역 -->
+                </form>
+            </div>
         </div>
         <div class="poster">poster</div>
     </div>
