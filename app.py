@@ -154,7 +154,7 @@ def re_main():
     data = {"student_id": ID,"username": USERNAME,"password_hash": PW} #데이터 삽입
     #db오류 시
     try:
-        response = supabase.table("users").insert(data).execute() #!! 주의 !! --> 데이터베이스에서 테스트 하다가 user_data랑 users의 id값 추가되는게 다를경우, 오류남!!!! 반드시 id 마지막 값 맞춰둘 것!!!!
+        response = supabase.table("users").insert(data).execute()
         response_stock = supabase.table("user_data").insert(data_stock).execute()
         return render_template('login.html', ID=ID, USERNAME=USERNAME)    
     except Exception as e:
@@ -245,10 +245,21 @@ def process_buy_stock():
         club: new_stock
     }
 
+    update_demand = {
+        "club_name" : club,
+        "demand" : amount,
+        "user_id" : user_id #유저 아이디 추가 -> 보안up(postgre오류 회피)
+    }
+
     update_response = supabase.table('user_data') \
                               .update(update_data) \
                               .eq("user_id", user_id) \
                               .execute()
+    
+    update_response_demand = supabase.table('supply_demand') \
+                                .insert(update_demand) \
+                                .execute()
+    print(update_demand)
     # if update_response.status_code != 200:
         # return "계좌 업데이트에 실패했습니다.", 500
 
