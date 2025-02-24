@@ -16,24 +16,22 @@
         </div>        
     </nav>
     <br><br><br>
-    <div class="contents">
+    <div class="contents" id="stock-container">
         {% for i in range(clubs | length) %}
-            <section>
-                <div class="club">
-                    <div class="club_logo"></div>
+        <section class="stock-card">
+            <div class="stock-info">
+                <div class="club_logo"></div>
+                <div class="text-container">
+                    <p class="club-name">{{ clubs[i] }}</p>
+                    <p class="price">{{ club_price[i+2] }}₩</p>
+                    <button class="buy_bt" onclick="location.href='{{ url_for('buy_stock', club=clubs[i]) }}';">Buy</button>
                 </div>
-                <div>
-                    <p>{{ clubs[i] }}</p>
-                    <p>{{club_price[i+2]}}₩</p>
-                    <button  class="buy_bt" onclick="location.href='{{ url_for('buy_stock', club=clubs[i]) }}';">Buy</button>
-                    </form>
-                    <!-- <button class="buy_bt" onclick="location.href='/buy_stock/{{ club | urlencode }}';">buy</button> -->
-                </div>
-                <div class="chart"></div>
-            </section><br>
+            </div>
+            <div class="chart"></div>
+        </section>
         {% endfor %}
-        <br><br><br>
     </div>
+    <br><br><br>
     
     <nav class="downnavbar">
         <form action="/ranking"><button type="submit" class="ranking_icon"></button></form>
