@@ -43,6 +43,9 @@ def update_stock_prices():
 
     # ✅ 가격 변동 적용 (-2000 ~ +2000)
     for col in df.columns[2:]:  # id, timestamp 제외
+        response_demand= supabase.table("supply_demand").select("demand").eq("club_name", str(col)).execute()
+        demand = response_demand.data[0]['demand'] if response_demand.data else 0
+        print(demand)
         df[col] = df[col].apply(lambda x: max(x + random.randint(-2000, 2000), 1000))
 
     # ✅ timestamp 업데이트
@@ -56,7 +59,7 @@ def update_stock_prices():
 
 # 🕒 스케줄러 설정: 10초마다 실행
 scheduler = BackgroundScheduler()
-scheduler.add_job(update_stock_prices, "interval", seconds=10)
+scheduler.add_job(update_stock_prices, "interval", seconds=5)
 scheduler.start()
 
 
@@ -247,8 +250,9 @@ def process_buy_stock():
 
     update_demand = {
         "club_name" : club,
+        "supply" : 0,
         "demand" : amount,
-        "user_id" : user_id #유저 아이디 추가 -> 보안up(postgre오류 회피)
+        "user_id" : user_id #유저 아이디 추가 -> 보안용(대조군 생성성)
     }
 
     update_response = supabase.table('user_data') \
