@@ -28,35 +28,47 @@ SUPABASE_URL="https://lwjodduasieisebkrusp.supabase.co"
 SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3am9kZHVhc2llaXNlYmtydXNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg2NDA0NjMsImV4cCI6MjA1NDIxNjQ2M30.3HaCNzho2G-mCYScAKVI2XuF4U24fSJqiVhEQZOtr4I"
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+def convert_to_serializable(obj):
+    """🔄 JSON 직렬화가 가능한 타입으로 변환"""
+    if isinstance(obj, (pd.Int64Dtype, pd.Float64Dtype)):
+        return int(obj)
+    elif isinstance(obj, pd.Timestamp):
+        return obj.isoformat()
+    return obj
+
 def update_stock_prices():
-    """🔄 10초마다 주식 가격 업데이트"""
-    # 📥 Supabase에서 현재 데이터 가져오기
-    response = supabase.table("stock_data").select("*").execute()
+    """🔄 10초마다 주식 가격을 새로운 행으로 추가하여 기록"""
+    # 📥 Supabase에서 가장 최근 데이터 가져오기
+    response = supabase.table("stock_data") \
+                       .select("*") \
+                       .order("timestamp", desc=True) \
+                       .limit(1) \
+                       .execute()
     records = response.data
 
     if not records:
         print("⚠️ 테이블에 데이터가 없습니다.")
         return
 
-    # DataFrame 변환
+   # 최근 데이터를 DataFrame으로 변환
     df = pd.DataFrame(records)
+
+    # ✅ 새 데이터 생성
+    new_data = {"timestamp": datetime.now().isoformat()}
 
     # ✅ 가격 변동 적용 (-2000 ~ +2000)
     for col in df.columns[2:]:  # id, timestamp 제외
-        response_demand= supabase.table("supply_demand").select("demand").eq("club_name", str(col)).execute()
-        demand = response_demand.data[0]['demand'] if response_demand.data else 0
-        print(demand)
-        df[col] = df[col].apply(lambda x: max(x + random.randint(-2000, 2000), 1000))
+        base_price = df.iloc[0][col]
+        new_price = max(int(base_price) + random.randint(-2000, 2000), 1000)
+        new_data[col] = int(new_price)  # int64 → int 변환
 
-    # ✅ timestamp 업데이트
-    df["timestamp"] = datetime.now().isoformat()
+    # ✅ 모든 값 직렬화 가능하도록 변환
+    new_data = {k: convert_to_serializable(v) for k, v in new_data.items()}
 
-    # 🔄 Supabase에 업데이트 적용
-    for _, row in df.iterrows():
-        supabase.table("stock_data").update(row.to_dict()).eq("id", row["id"]).execute()
+    # 🔄 Supabase에 **새로운 행 추가**
+    supabase.table("stock_data").insert(new_data).execute()
 
-    print(f"✅ [{datetime.now()}] 주식 가격 업데이트 완료!")
-
+    print(f"✅ [{new_data['timestamp']}] 주식 가격 추가 완료!")
 # 🕒 스케줄러 설정: 10초마다 실행
 scheduler = BackgroundScheduler()
 scheduler.add_job(update_stock_prices, "interval", seconds=5)
