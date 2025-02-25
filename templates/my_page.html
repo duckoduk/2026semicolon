@@ -110,12 +110,14 @@
                         <div class="button_group"> 
                             <form action="/buy_stock" method="post">
                                 <input type="hidden" name="club" value="{{ club }}">
-                                <input type="number" name="amount" placeholder="구매할 주식 수량">
-                                <button type="submit" class="buy_bt">매수</button> 
+                                <input type="number" id="amountInput" name="amount" class="quantity-input" min="1" oninput="calculate()" placeholder="수량 입력">
+                                <button type="submit" class="buy_bt">매수</button>
+                            </form>
                             <form action="/sell_stock" method="post">
                                 <input type="hidden" name="club" value="{{ club }}">
-                                <input type="number" name="amount" placeholder="매도할 주식 수량">
+                                <input type="number" id="amountInput" name="amount" class="quantity-input" min="1" oninput="calculate()" placeholder="수량 입력">
                                 <button type="submit" class="sell_bt">매도</button> 
+                            </form>
                         </div>
                     </form>
                 </section>
