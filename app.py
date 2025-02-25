@@ -9,7 +9,10 @@ import random
 import pandas as pd
 from sqlalchemy import create_engine
 from datetime import datetime
+import numpy as np
 
+sigma = 0.02 #표준편차(변동성) 일단 2%
+k = 0.1 #기본 주식 가격 변동률(가중치) 일단 10%
 #비밀번호 암호화해서 저장
 #근뎅 bcrypt첨 해봐서 뭔지 잘 모르겟엉
 def hashing(pw):
@@ -46,20 +49,35 @@ def update_stock_prices():
                        .execute()
     records = response.data
 
-    if not records:
+    response_supply_demand = supabase.table("supply_demand")\
+                                     .select("*")\
+                                     .execute()
+    supply_demand = response_supply_demand.data
+
+    if not records or not supply_demand:
         print("⚠️ 테이블에 데이터가 없습니다.")
         return
 
    # 최근 데이터를 DataFrame으로 변환
     df = pd.DataFrame(records)
-
+    #랜덤 변동성(정규분포)
+    epsilon = np.random.normal(0, sigma)
     # ✅ 새 데이터 생성
     new_data = {"timestamp": datetime.now().isoformat()}
-
+    club_name=set([row['club_name'] for row in supply_demand])
     # ✅ 가격 변동 적용 (-2000 ~ +2000)
     for col in df.columns[2:]:  # id, timestamp 제외
         base_price = df.iloc[0][col]
-        new_price = max(int(base_price) + random.randint(-2000, 2000), 1000)
+        if col in club_name:
+            demand = sum([int(row['demand']) for row in supply_demand if row['club_name'] == col])
+            supply = sum([int(row['supply']) for row in supply_demand if row['club_name'] == col])
+            non_zero_supply = max(supply, 1)  # 0으로 나누는 오류 방지
+            new_price = base_price*(demand/non_zero_supply)**k + np.exp(epsilon)
+            print(f"k={k}")
+            print(f"k={k}기존 가격: {base_price}, 변동 비율: {(demand / supply) ** k}, 최종 변동: {np.exp(epsilon)}")
+            print(new_price)#일단 지금 1.xxxxxxxxxx씩 아니면 0.xxxxxxxxx씩 이런식으로 바뀌는데 여기다가 랜덤해서 곱해도 되고 암튼 상수만 곱하면 될듯????? 와 신난다 이거 막 수요>공급이면 가격 떨어지고 수요<공급이면 가격 막 오름 개신기해 그냥 와 씨
+        else:
+            new_price = max(int(base_price) + random.randint(-2000, 2000), 1000)
         new_data[col] = int(new_price)  # int64 → int 변환
 
     # ✅ 모든 값 직렬화 가능하도록 변환
@@ -71,7 +89,7 @@ def update_stock_prices():
     print(f"✅ [{new_data['timestamp']}] 주식 가격 추가 완료!")
 # 🕒 스케줄러 설정: 10초마다 실행
 scheduler = BackgroundScheduler()
-scheduler.add_job(update_stock_prices, "interval", seconds=5)
+scheduler.add_job(update_stock_prices, "interval", seconds=1)#test
 scheduler.start()
 
 
