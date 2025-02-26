@@ -2,6 +2,11 @@
 <image src="https://media1.tenor.com/m/HxRw5A_P-y8AAAAd/dancing-rat-rat.gif">
 <br>
 
+https://supabase.com/dashboard/project/lwjodduasieisebkrusp
+
+https://www.notion.so/v2-16a35b9640d88023b343db7a01903e9f
+
+
 - 동아리 명단이나 리스트 찾아오기<br>
 - buy_stock.html 완성<br>
 - buy_stock.html 매수 기능 구현 <br>
