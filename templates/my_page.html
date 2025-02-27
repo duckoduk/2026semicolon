@@ -9,63 +9,6 @@
 <body>
 
 <div id="stockData" data-stocks='{{ stock | tojson | safe }}'></div>
-
-<script>
-    function sendRequest(event) {
-        event.preventDefault();  // 기본 폼 제출 막기
-        console.log("🔵 버튼 클릭됨"); //디버깅 - 버튼클릭감지
-
-        let form = event.target; // 현재 이벤트가 발생한 폼을 가져옴
-        let quantityInput = form.querySelector("input[type='number']"); // 폼 내에서 quantity 찾기
-        let quantity = quantityInput.value; // quantity input값 가져오기
-        let button = event.submitter; // 눌린 버튼 가져오기
-
-        if (!button) { // 버튼 인식 없음
-            console.error("❌ 버튼 정보를 가져올 수 없습니다.");
-            return false;
-        }
-
-        let stock = button.value; // 버튼의 value값(동아리명)
-        console.log(`수량 : ${quantity}, 주식 ${stock}`);
-
-        if (!quantity || quantity <= 0){
-            alert("올바른 수량을 입력하세요.");
-            return false;
-        }
-
-        //URL 경로로 data-action 처리하기
-        let action = button.getAttribute("data-action");  // data-action 값을 URL에 삽입
-        
-        fetch(`/${action}`, {  //전송(flask파일로)
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ quantity: quantity, stock:stock }) 
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
-            window.location.reload(); //자동 새로고침
-        })
-        .catch(error => { //기타문제일 경우
-            console.error("❌ 요청 실패:", error);
-            alert("요청 처리 중 문제가 발생했습니다.");
-        });
-        return false;
-    }
-    function setBtStock() {
-        let stockElement = document.getElementById("stockData"); // Flask에서 받은 주식 목록
-        let stockNames = JSON.parse(stockElement.getAttribute("data-stocks")); // JSON 파싱 후 사용
-
-        let forms = document.querySelectorAll('.inputs'); // 모든 폼 가져오기
-        forms.forEach((form, index) => {
-            let buttons = form.querySelectorAll('.buy_bt, .sell_bt'); // 현재 폼 안의 버튼 가져오기
-            buttons.forEach(button => {
-                button.value = stockNames[index]; // 해당 폼의 stock name을 버튼 value로 설정
-            });
-        });
-    }
-    window.onload = setBtStock;  // 페이지가 로드될 때 setBtStock 함수 호출
-</script>
  
 
 <nav class="upnavbar">
@@ -102,24 +45,46 @@
                                 <p style="color: green;">+0.05%</p> 
                             </div>
                             <p>보유 수량 : {{stock_num[i]}} </p>
+                            <p >현재가격 : <span id="stock_value">{{stock_price[i]}}</span></p>
                             <p>총 가치 : {{stock_price[i]*stock_num[i]}} </p>
                             <p>수익률 : SAMPLE</p> <!-- 나중에 SAMPLE 지울것! 일단 테스트용 -->
                         </div>
                     </div>
-                    <form class="inputs" style="display: flex; margin-top: 15px;" method="POST" onsubmit="return sendRequest(event)">
+                    <div class="inputs" style="display: flex; margin-top: 15px;">
                         <div class="button_group"> 
-                            <form action="/buy_stock" method="post">
-                                <input type="hidden" name="club" value="{{ club }}">
-                                <input type="number" id="amountInput" name="amount" class="quantity-input" min="1" oninput="calculate()" placeholder="수량 입력">
-                                <button type="submit" class="buy_bt">매수</button>
-                            </form>
+                            <div class="buy_container">
+                                <div class="purchase-section">
+                                    <form action="/buy_stock" method="post">
+                                        <input type="hidden" name="club" value="{{ stock[i] }}">
+                                        <input type="number" id="amountInput" name="amount" class="quantity-input" min="1" oninput="calculate()" placeholder="수량 입력">
+                                        <button type="submit" class="buy_bt">추가매수</button>
+                                        <script>
+                                            function calculate() {
+                                                const stock_value = document.getElementById("stock_value").textContent; // app.py에서 받은 값
+                                                const amount = parseFloat(document.getElementById("amountInput").value); // 입력값
+                                                console.log("stock_value:", stock_value)
+                                                console.log("amount:", amount)
+                                    
+                                                if (!isNaN(stock_value) && !isNaN(amount)) {    
+                                                    const result = stock_value * amount;
+                                                    document.getElementById("result").textContent = result.toLocaleString(); // 결과 표시
+                                                } else {
+                                                    document.getElementById("result").textContent = "올바른 숫자를 입력하세요!";
+                                                }
+                                            }
+                                        </script>
+                                        <p><strong>총액:</strong> <span id="result">0</span></p> <!-- 총액 표시 영역 -->
+                                    </form>
+                                </div>
+                            </div>
                             <form action="/sell_stock" method="post">
-                                <input type="hidden" name="club" value="{{ club }}">
+                                <input type="hidden" name="club" value="{{ stock[i] }}">
                                 <input type="number" id="amountInput" name="amount" class="quantity-input" min="1" oninput="calculate()" placeholder="수량 입력">
-                                <button type="submit" class="sell_bt">매도</button> 
+                                <button type="submit" class="sell_bt">매도</button>
+                                
                             </form>
                         </div>
-                    </form>
+                    </div>
                 </section>
             </div>
             <br>

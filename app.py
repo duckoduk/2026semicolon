@@ -107,7 +107,7 @@ def update_stock_prices():
     print(f"✅ [{new_data['timestamp']}] 주식 가격 추가 완료!")
 # 🕒 스케줄러 설정: 10초마다 실행
 scheduler = BackgroundScheduler()
-scheduler.add_job(update_stock_prices, "interval", seconds=1)#test
+scheduler.add_job(update_stock_prices, "interval", seconds=10000000)#test
 scheduler.start()
 
 
@@ -237,6 +237,7 @@ def process_buy_stock():
     # 폼 데이터 받기
     club = request.form.get('club')
     amount_str = request.form.get('amount')
+    print(club,'/' ,amount_str)
     if not club or not amount_str:
         return "club과 구매 수량이 필요합니다.", 400
     try:
