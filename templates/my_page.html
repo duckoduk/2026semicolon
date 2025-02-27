@@ -9,7 +9,31 @@
 <body>
 
 <div id="stockData" data-stocks='{{ stock | tojson | safe }}'></div>
- 
+<script>
+    function calculate(event) {
+        const form = event.target.closest("form");  // 현재 입력 필드가 속한 form 찾기
+        if (!form) return;
+
+        const stockValueElement = form.closest(".contents").querySelector("#stock_value"); 
+        const stockValue = parseFloat(stockValueElement.textContent.trim()); 
+        const amount = parseFloat(event.target.value);
+
+        
+
+        const resultDisplay = form.querySelector(".result"); // resultDisplay 찾기
+
+        console.log("stockValue:", stockValue)
+        console.log("amount:", amount)
+        console.log("result:",resultDisplay)
+
+        if (!isNaN(stockValue) && !isNaN(amount)) {    
+            resultDisplay.textContent = (stockValue * amount).toLocaleString();
+        } else {
+            resultDisplay.textContent = "올바른 숫자를 입력하세요!";
+        }
+    }
+    
+</script>
 
 <nav class="upnavbar">
     <div class="logo"></div>
@@ -53,36 +77,19 @@
                     <div class="inputs" style="display: flex; margin-top: 15px;">
                         <div class="button_group"> 
                             <div class="buy_container">
-                                <div class="purchase-section">
                                     <form action="/buy_stock" method="post">
                                         <input type="hidden" name="club" value="{{ stock[i] }}">
-                                        <input type="number" id="amountInput" name="amount" class="quantity-input" min="1" oninput="calculate()" placeholder="수량 입력">
+                                        <input type="number" name="amount" class="quantity-input" min="1" oninput="calculate(event)" placeholder="수량 입력">
                                         <button type="submit" class="buy_bt">추가매수</button>
-                                        <script>
-                                            function calculate() {
-                                                const stock_value = document.getElementById("stock_value").textContent; // app.py에서 받은 값
-                                                const amount = parseFloat(document.getElementById("amountInput").value); // 입력값
-                                                console.log("stock_value:", stock_value)
-                                                console.log("amount:", amount)
-                                    
-                                                if (!isNaN(stock_value) && !isNaN(amount)) {    
-                                                    const result = stock_value * amount;
-                                                    document.getElementById("result").textContent = result.toLocaleString(); // 결과 표시
-                                                } else {
-                                                    document.getElementById("result").textContent = "올바른 숫자를 입력하세요!";
-                                                }
-                                            }
-                                        </script>
-                                        <p><strong>총액:</strong> <span id="result">0</span></p> <!-- 총액 표시 영역 -->
+                                        <p><strong>총액:</strong> <span class="result">0</span></p> <!-- 총액 표시 영역 -->
                                     </form>
-                                </div>
+                                <form action="/sell_stock" method="post">
+                                    <input type="hidden" name="club" value="{{ stock[i] }}">
+                                    <input type="number" name="amount" class="quantity-input" min="1" oninput="calculate(event)" placeholder="수량 입력">
+                                    <button type="submit" class="sell_bt">매도</button>
+                                    <p><strong>총액:</strong> <span class="result">0</span></p>
+                                </form>
                             </div>
-                            <form action="/sell_stock" method="post">
-                                <input type="hidden" name="club" value="{{ stock[i] }}">
-                                <input type="number" id="amountInput" name="amount" class="quantity-input" min="1" oninput="calculate()" placeholder="수량 입력">
-                                <button type="submit" class="sell_bt">매도</button>
-                                
-                            </form>
                         </div>
                     </div>
                 </section>
