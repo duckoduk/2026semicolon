@@ -30,55 +30,36 @@
             resultDisplay.textContent = "올바른 숫자를 입력하세요!";
         }
     }
-    // 매수 폼 제출 처리
-    document.getElementById("buyForm").addEventListener("submit", async function(event) {
-    event.preventDefault(); // 기본 폼 제출을 막기
+    document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".buy_bt, .sell_bt").forEach(button => {
+        button.addEventListener("click", function (event) {
+            event.preventDefault();  // 기본 폼 제출 방지
 
-    const formData = new FormData(this); // 폼 데이터를 자동으로 수집
+            const form = event.target.closest("form");
+            const formData = new FormData(form);
 
-    try {
-        const response = await fetch("/buy_stock", {
-            method: "POST",
-            body: formData
+            fetch(form.action, {
+                method: form.method,
+                body: formData
+            })
+            .then(response => response.json()) // JSON 형태로 응답을 받음
+            .then(data => {
+                if (data.message) {
+                    alert(data.message); // Flask에서 보낸 메시지를 alert으로 출력
+                } else {
+                    alert("서버 응답 형식 오류!");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("요청 처리 중 오류가 발생했습니다.");
+            });
         });
-
-        const result = await response.text();
-        alert(result);  // 응답 메시지 표시
-
-        // 응답이 정상일 경우 새로고침
-        if (response.ok) {
-            location.reload();
-        }
-    } catch (error) {
-        console.error("Error:", error);
-        alert("거래 중 오류가 발생했습니다.");
-    }
+    });
 });
 
-// 매도 폼 제출 처리
-document.getElementById("sellForm").addEventListener("submit", async function(event) {
-    event.preventDefault(); // 기본 폼 제출을 막기
 
-    const formData = new FormData(this); // 폼 데이터를 자동으로 수집
 
-    try {
-        const response = await fetch("/buy_stock", {
-            method: "POST",
-            body: formData
-        });
-
-        const result = await response.text();
-        alert(result);  // 응답 메시지 표시
-
-        // 응답이 정상일 경우 새로고침
-        if (response.ok) {
-            location.reload();
-        }
-    } catch (error) {
-        console.error("Error:", error);
-        alert("거래 중 오류가 발생했습니다.");
-    }
-});
 </script>
 
 <nav class="upnavbar">

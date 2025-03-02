@@ -257,19 +257,19 @@ def process_buy_stock():
 
     recent_data = response.data[0]
     if club not in recent_data:
-        return f"주식 데이터에 '{club}' 클럽 정보가 없습니다.", 400
+        return jsonify({f"주식 데이터에 '{club}' 클럽 정보가 없습니다."}), 400
 
     try:
         price = float(recent_data[club])
     except ValueError:
-        return "주식 가격 데이터에 오류가 있습니다.", 400
+        return jsonify({"주식 가격 데이터에 오류가 있습니다."}), 400
 
     total_cost = price * amount
 
     # 세션에서 로그인된 사용자의 user_id 가져오기
     user_id = session.get('user_id')
     if not user_id:
-        return "로그인된 사용자가 없습니다.", 401
+        return jsonify({"로그인된 사용자가 없습니다."}), 401
 
     # user_data 테이블에서 user_id로 사용자 데이터 조회
     user_response = supabase.table('user_data') \
@@ -277,16 +277,16 @@ def process_buy_stock():
                             .eq("user_id", user_id) \
                             .execute()
     if not user_response.data:
-        return "사용자 데이터를 찾을 수 없습니다.", 404
+        return jsonify({"사용자 데이터를 찾을 수 없습니다."}), 404
 
     user_data = user_response.data[0]
     try:
         current_balance = float(user_data['balance'])
     except ValueError:
-        return "계좌 잔액 데이터 오류", 400
+        return jsonify({"계좌 잔액 데이터 오류"}), 400
 
     if current_balance < total_cost:
-        return "잔액이 부족합니다.", 400
+        return jsonify({"잔액이 부족합니다."}), 400
 
     if trade=="buy":
         # 잔액 차감 및 해당 클럽의 보유 주식 수 업데이트
@@ -318,8 +318,11 @@ def process_buy_stock():
         # if update_response.status_code != 200:
             # return "계좌 업데이트에 실패했습니다.", 500
 
-        return f"매수 성공: '{club}' 주식 {amount}주를 {total_cost}원에 매수하였습니다."
+        return jsonify({"message": f"매수 성공: '{club}' 주식 {amount}주를 {total_cost}원에 매수하였습니다."})
+
     else: #trade ==sell
+        if int(user_data.get(club, 0)) < amount:
+            return jsonify({"보유 주식이 부족합니다."}), 400  # 매도 수량 검증 추가
         # 잔액 차감 및 해당 클럽의 보유 주식 수 업데이트
         new_balance = current_balance + total_cost
         current_stock = int(user_data.get(club, 0))
@@ -349,7 +352,7 @@ def process_buy_stock():
         # if update_response.status_code != 200:
             # return "계좌 업데이트에 실패했습니다.", 500
 
-        return f"매도 성공: '{club}' 주식 {amount}주를 {total_cost}원에 매도하였습니다."
+        return jsonify({"message": f"매도 성공: '{club}' 주식 {amount}주를 {total_cost}원에 매도하였습니다."})
 # @app.route('/stock')
 # def my_page():
     # clubs=['세미콜론','실험의숲','그레이스','뉴턴','다독다독','데이터무제한','디세뇨','디아리오','메시스트','빌리네어','소솜','심쿵','아리솔','에스쿱','에어로테크','엘리제','온에어','티아','파라미터','피지카스트로','하람','늘품','세븐일레븐','매드매쓰','도담','데카르트','수학에복종','아페토','메이키스','폴리머','라온제나','리사','아스클레오피스','수북수북','아이티아이','럭스','쿠데타','헥사곤','개벽','혜윰']
