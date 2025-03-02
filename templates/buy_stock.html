@@ -4,46 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stockolon {{username}}</title>
-    <!-- <link rel="stylesheet" href="static/css/buy_stock.css"> -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/buy_stock.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 </head>
 <body>
 
     <nav class="upnavbar">
         <div class="logo"></div>
-        <p style = 'margin: 0px 0px'><span style="color: #A6F4BC;">S</span>TOC<span style="color: #A6F4BC;">K</span>OLON!</p>    
+        <p><span style="color: #A6F4BC;">S</span>TOC<span style="color: #A6F4BC;">K</span>OLON!</p>    
         <div class='navbar-username'>
             {{username}}
         </div>        
     </nav>
-    <br><br><br>
     <div class="container">
         <div class="details">
             <div class="club_logo"></div>
             <div class="info">
                 <h1>{{ club }}</h1>
-                <div style="display: flex; align-items: center; gap: 20px;">
-                    <div class="tags1" >
-                        <p style="margin: 0px 0px 0px 0px;">{{ description[0] }}</p>
-                        <p style="margin: 0px 0px 0px 0px;">{{ description[1] }}</p>
+                <div class="tags">
+                    <div class="tags1">
+                        <p>{{ description[0] }}</p>
+                        <p>{{ description[1] }}</p>
                     </div>
                     <div class="tags2">
-                        <p style="margin: 0px 0px 0px 0px;">{{ description[2] }}</p>
-                        <p style="margin: 0px 0px 0px 0px;">{{ description[3] }}</p>
+                        <p>{{ description[2] }}</p>
+                        <p>{{ description[3] }}</p>
                     </div>
                 </div>
                 <p>동아리 설명 아직 연결 안함</p>
             </div>
         </div>
-        <div class="price" style="display: flex; gap: 20px; height: auto;">
+        <div class="price">
             <span id="stock_value">{{ stock_value }}</span>
             <p style="color: green;">+0.05%</p> 
-        </div><!-- SAMPLE -->
-        <div class="gain,lose" style="display: flex;">
-            <div class="gain_box" style="border: solid black 1px;">gain</div>
-            <div class="lost-box" style="border: solid black 1px;">lose</div>
-        </div> <!-- 폐기가능성 있음 -->
-        <div class="chart">chart</div>
+        </div>
+        <div class="chart">
+            <canvas id="stockChart" style="width: 100%; height: 400px;"></canvas>
+        </div>
+        <script>
+            async function fetchStockData() {
+                const response = await fetch('/stock_data/{{ club }}');
+                const data = await response.json();
+                console.log('Fetched data:', data);
+                return data;
+            }
+
+            async function renderChart() {
+                const stockData = await fetchStockData();
+                const ctx = document.getElementById('stockChart').getContext('2d');
+                console.log('Rendering chart with data:', stockData);
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: stockData.dates.map((_, index) => index + 1),
+                        datasets: [{
+                            label: 'Stock Price',
+                            data: stockData.prices,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                type: 'category',
+                                title: {
+                                    display: false // Hide the X-axis title
+                                }
+                            },
+                            y: {
+                                beginAtZero: false
+                            }
+                        }
+                    }
+                });
+            }
+
+            renderChart();
+        </script>
         <div class="buy_container">
             <div class="balance"><p>보유 자금: {{ "{:,}".format(balance|int) }}</p></div>
             <div class="purchase-section">
@@ -53,25 +93,25 @@
                     <button type="submit" class="buy_bt">구매</button>
                     <script>
                         function calculate() {
-                            const stock_value = parseFloat(document.getElementById("stock_value").textContent); // app.py에서 받은 값
-                            const amount = parseFloat(document.getElementById("amountInput").value); // 입력값
+                            const stock_value = parseFloat(document.getElementById("stock_value").textContent);
+                            const amount = parseFloat(document.getElementById("amountInput").value);
                 
                             if (!isNaN(stock_value) && !isNaN(amount)) {
                                 const result = stock_value * amount;
-                                document.getElementById("result").textContent = result.toLocaleString(); // 결과 표시
+                                document.getElementById("result").textContent = result.toLocaleString();
                             } else {
                                 document.getElementById("result").textContent = "올바른 숫자를 입력하세요!";
                             }
                         }
                     </script>
-                    <p><strong>총액:</strong> <span id="result">0</span></p> <!-- 총액 표시 영역 -->
+                    <p><strong>총액:</strong> <span id="result">0</span></p>
                 </form>
             </div>
         </div>
         <div class="poster">poster</div>
     </div>
     <nav class="downnavbar">
-        <div class="ranking_icon"></div>
+        <form action="/ranking"><button type="submit" class="ranking_icon"></button></form>
         <form action="/home"><button type="submit" class="home_icon"></button></form>
         <form action="/stock" method="get"><button type="submit" class="wallet_icon"></button></form>
     </nav>

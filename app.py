@@ -409,5 +409,23 @@ def ranking():
 
     return render_template('ranking.html', username=session['username'], ranking=ranking)
 
+@app.route('/stock_data/<club>')
+def stock_data(club):
+    response = supabase.table('stock_data') \
+                       .select('timestamp, ' + club) \
+                       .order('timestamp', desc=True) \
+                       .limit(20) \
+                       .execute()
+    if not response.data:
+        return jsonify({"dates": [], "prices": []})
+
+    # Reverse the data to have the oldest first
+    response.data.reverse()
+
+    dates = [row['timestamp'] for row in response.data]
+    prices = [row[club] for row in response.data]
+
+    return jsonify({"dates": dates, "prices": prices})
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
