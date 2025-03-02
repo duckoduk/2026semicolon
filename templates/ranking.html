@@ -11,7 +11,26 @@
         <div class="logo"></div>
         <p style = 'margin: 0px 0px'><span style="color: #A6F4BC;">S</span>TOC<span style="color: #A6F4BC;">K</span>OLON!</p>    
         <div class='navbar-username'>{{username}}</div>        
-    </nav>
+    </nav> <br><br><br>
+    <div class="container">
+        <div class="ranking">
+            <h1>Ranking</h1>
+            <table>
+                <tr>
+                    <th>Rank</th>
+                    <th>Username</th>
+                    <th>Total Assets</th>
+                </tr>
+                {% for i in range(ranking|length) %}
+                    <tr>
+                        <td>{{i+1}}</td>
+                        <td>{{ranking[i].username}}</td>
+                        <td>{{ranking[i].total_assets}}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
     <nav class="downnavbar">
         <form action="/ranking"><button type="submit" class="ranking_icon"></button></form>
         <form action="/home"><button type="submit" class="home_icon"></button></form>
