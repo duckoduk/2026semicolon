@@ -18,8 +18,6 @@
         const stockValue = parseFloat(stockValueElement.textContent.trim()); 
         const amount = parseFloat(event.target.value);
 
-        
-
         const resultDisplay = form.querySelector(".result"); // resultDisplay 찾기
 
         console.log("stockValue:", stockValue)
@@ -32,7 +30,55 @@
             resultDisplay.textContent = "올바른 숫자를 입력하세요!";
         }
     }
-    
+    // 매수 폼 제출 처리
+    document.getElementById("buyForm").addEventListener("submit", async function(event) {
+    event.preventDefault(); // 기본 폼 제출을 막기
+
+    const formData = new FormData(this); // 폼 데이터를 자동으로 수집
+
+    try {
+        const response = await fetch("/buy_stock", {
+            method: "POST",
+            body: formData
+        });
+
+        const result = await response.text();
+        alert(result);  // 응답 메시지 표시
+
+        // 응답이 정상일 경우 새로고침
+        if (response.ok) {
+            location.reload();
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("거래 중 오류가 발생했습니다.");
+    }
+});
+
+// 매도 폼 제출 처리
+document.getElementById("sellForm").addEventListener("submit", async function(event) {
+    event.preventDefault(); // 기본 폼 제출을 막기
+
+    const formData = new FormData(this); // 폼 데이터를 자동으로 수집
+
+    try {
+        const response = await fetch("/buy_stock", {
+            method: "POST",
+            body: formData
+        });
+
+        const result = await response.text();
+        alert(result);  // 응답 메시지 표시
+
+        // 응답이 정상일 경우 새로고침
+        if (response.ok) {
+            location.reload();
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("거래 중 오류가 발생했습니다.");
+    }
+});
 </script>
 
 <nav class="upnavbar">
@@ -77,14 +123,16 @@
                     <div class="inputs" style="display: flex; margin-top: 15px;">
                         <div class="button_group"> 
                             <div class="buy_container">
-                                    <form action="/buy_stock" method="post">
-                                        <input type="hidden" name="club" value="{{ stock[i] }}">
-                                        <input type="number" name="amount" class="quantity-input" min="1" oninput="calculate(event)" placeholder="수량 입력">
-                                        <button type="submit" class="buy_bt">추가매수</button>
-                                        <p><strong>총액:</strong> <span class="result">0</span></p> <!-- 총액 표시 영역 -->
-                                    </form>
-                                <form action="/sell_stock" method="post">
+                                <form id="buy_form" action="/buy_stock" method="post">
                                     <input type="hidden" name="club" value="{{ stock[i] }}">
+                                    <input type="hidden" name="trade" value="buy">
+                                    <input type="number" name="amount" class="quantity-input" min="1" oninput="calculate(event)" placeholder="수량 입력">
+                                    <button type="submit" class="buy_bt">추가매수</button>
+                                    <p><strong>총액:</strong> <span class="result">0</span></p> <!-- 총액 표시 영역 -->
+                                </form>
+                                <form id="sell_form" action="/buy_stock" method="post">
+                                    <input type="hidden" name="club" value="{{ stock[i] }}">
+                                    <input type="hidden" name="trade" value="sell">
                                     <input type="number" name="amount" class="quantity-input" min="1" oninput="calculate(event)" placeholder="수량 입력">
                                     <button type="submit" class="sell_bt">매도</button>
                                     <p><strong>총액:</strong> <span class="result">0</span></p>

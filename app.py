@@ -235,15 +235,16 @@ def get_description_by_club(club_name):
 @app.route('/buy_stock', methods=['POST'])
 def process_buy_stock():
     # 폼 데이터 받기
+    trade = request.form.get('trade') #trade는 'buy'아니면 'sell'
     club = request.form.get('club')
     amount_str = request.form.get('amount')
     print(club,'/' ,amount_str)
     if not club or not amount_str:
-        return "club과 구매 수량이 필요합니다.", 400
+        return jsonify({"error":"club과 구매 수량이 필요합니다."}), 400
     try:
         amount = int(amount_str)
     except ValueError:
-        return "구매 수량은 숫자여야 합니다.", 400
+        return jsonify({"구매 수량은 숫자여야 합니다."}), 400
 
     # stock_data 테이블에서 최신 주식 가격 조회
     response = supabase.table('stock_data') \
@@ -252,7 +253,7 @@ def process_buy_stock():
                        .limit(1) \
                        .execute()
     if not response.data:
-        return "최신 주식 데이터가 없습니다.", 400
+        return jsonify({"최신 주식 데이터가 없습니다."}), 400
 
     recent_data = response.data[0]
     if club not in recent_data:
@@ -287,37 +288,68 @@ def process_buy_stock():
     if current_balance < total_cost:
         return "잔액이 부족합니다.", 400
 
-    # 잔액 차감 및 해당 클럽의 보유 주식 수 업데이트
-    new_balance = current_balance - total_cost
-    current_stock = int(user_data.get(club, 0))
-    new_stock = current_stock + amount
+    if trade=="buy":
+        # 잔액 차감 및 해당 클럽의 보유 주식 수 업데이트
+        new_balance = current_balance - total_cost
+        current_stock = int(user_data.get(club, 0))
+        new_stock = current_stock + amount
 
-    update_data = {
-        "balance": new_balance,
-        club: new_stock
-    }
+        update_data = {
+            "balance": new_balance,
+            club: new_stock
+        }
 
-    update_demand = {
-        "club_name" : club,
-        "supply" : 0,
-        "demand" : amount,
-        "user_id" : user_id #유저 아이디 추가 -> 보안용(대조군 생성성)
-    }
+        update_demand = {
+            "club_name" : club,
+            "supply" : 0,
+            "demand" : amount,
+            "user_id" : user_id #유저 아이디 추가 -> 보안용(대조군 생성성)
+        }
 
-    update_response = supabase.table('user_data') \
-                              .update(update_data) \
-                              .eq("user_id", user_id) \
-                              .execute()
-    
-    update_response_demand = supabase.table('supply_demand') \
-                                .insert(update_demand) \
+        update_response = supabase.table('user_data') \
+                                .update(update_data) \
+                                .eq("user_id", user_id) \
                                 .execute()
-    print(update_demand)
-    # if update_response.status_code != 200:
-        # return "계좌 업데이트에 실패했습니다.", 500
+        
+        update_response_demand = supabase.table('supply_demand') \
+                                    .insert(update_demand) \
+                                    .execute()
+        print(update_demand)
+        # if update_response.status_code != 200:
+            # return "계좌 업데이트에 실패했습니다.", 500
 
-    return f"구매 성공: '{club}' 주식 {amount}주를 {total_cost}원에 구매했습니다."
-    
+        return f"매수 성공: '{club}' 주식 {amount}주를 {total_cost}원에 매수하였습니다."
+    else: #trade ==sell
+        # 잔액 차감 및 해당 클럽의 보유 주식 수 업데이트
+        new_balance = current_balance + total_cost
+        current_stock = int(user_data.get(club, 0))
+        new_stock = current_stock - amount
+
+        update_data = {
+            "balance": new_balance,
+            club: new_stock
+        }
+
+        update_demand = {
+            "club_name" : club,
+            "supply" : amount,
+            "demand" : 0,
+            "user_id" : user_id #유저 아이디 추가 -> 보안용(대조군 생성성)
+        }
+
+        update_response = supabase.table('user_data') \
+                                .update(update_data) \
+                                .eq("user_id", user_id) \
+                                .execute()
+        
+        update_response_demand = supabase.table('supply_demand') \
+                                    .insert(update_demand) \
+                                    .execute()
+        print(update_demand)
+        # if update_response.status_code != 200:
+            # return "계좌 업데이트에 실패했습니다.", 500
+
+        return f"매도 성공: '{club}' 주식 {amount}주를 {total_cost}원에 매도하였습니다."
 # @app.route('/stock')
 # def my_page():
     # clubs=['세미콜론','실험의숲','그레이스','뉴턴','다독다독','데이터무제한','디세뇨','디아리오','메시스트','빌리네어','소솜','심쿵','아리솔','에스쿱','에어로테크','엘리제','온에어','티아','파라미터','피지카스트로','하람','늘품','세븐일레븐','매드매쓰','도담','데카르트','수학에복종','아페토','메이키스','폴리머','라온제나','리사','아스클레오피스','수북수북','아이티아이','럭스','쿠데타','헥사곤','개벽','혜윰']
