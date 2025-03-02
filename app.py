@@ -414,10 +414,50 @@ def sell():
     return jsonify({"message": f"매도 완료! 수량: {quantity}, 주식: {stock}"}), 200
 
 # 랭킹
-@app.route('/ranking')
-def ranking() :
+@app.route('/ranking') 
+def ranking():
+    response = supabase.table('user_data') \
+                       .select('user_id, total_assets') \
+                       .order('total_assets', desc=True) \
+                       .execute()
+    if not response.data:
+        return render_template('ranking.html', username=session['username'], ranking=[])
+    
+    # Fetch usernames for each user_id
+    user_ids = [row['user_id'] for row in response.data]
+    users_response = supabase.table('users') \
+                             .select('student_id, username') \
+                             .in_('student_id', user_ids) \
+                             .execute()
+    users = {user['student_id']: user['username'] for user in users_response.data}
 
-    return render_template('ranking.html', username=session['username'])
+    ranking = [
+        {
+            'username': users[row['user_id']],
+            'total_assets': row['total_assets']
+        }
+        for row in response.data
+    ]
+
+    return render_template('ranking.html', username=session['username'], ranking=ranking)
+
+@app.route('/stock_data/<club>')
+def stock_data(club):
+    response = supabase.table('stock_data') \
+                       .select('timestamp, ' + club) \
+                       .order('timestamp', desc=True) \
+                       .limit(20) \
+                       .execute()
+    if not response.data:
+        return jsonify({"dates": [], "prices": []})
+
+    # Reverse the data to have the oldest first
+    response.data.reverse()
+
+    dates = [row['timestamp'] for row in response.data]
+    prices = [row[club] for row in response.data]
+
+    return jsonify({"dates": dates, "prices": prices})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True) 
+    app.run(host='0.0.0.0', port=5000, debug=True)
