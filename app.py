@@ -39,6 +39,9 @@ def convert_to_serializable(obj):
         return obj.isoformat()
     return obj
 
+def profit_rate(cP, aP):
+    return f'{round((cP - aP) / aP, 2)}%'
+
 def update_stock_prices():
     """🔄 10초마다 주식 가격을 새로운 행으로 추가하여 기록"""
     # 📥 Supabase에서 가장 최근 데이터 가져오기
@@ -285,6 +288,16 @@ def process_buy_stock():
     except ValueError:
         return jsonify({"계좌 잔액 데이터 오류"}), 400
 
+    try:
+        average_cost = float(user_data[club+'_평균구매가'])
+    except ValueError:
+        return jsonify({"평균 매수가 데이터 오류"}), 400
+    
+    try:
+        current_amount = int(user_data[club])
+    except ValueError:
+        return jsonify({"주식 보유량 데이터 오류"}), 400
+
     if current_balance < total_cost:
         return jsonify({"잔액이 부족합니다."}), 400
 
@@ -292,11 +305,14 @@ def process_buy_stock():
         # 잔액 차감 및 해당 클럽의 보유 주식 수 업데이트
         new_balance = current_balance - total_cost
         current_stock = int(user_data.get(club, 0))
+        average_cost = (average_cost*current_amount + total_cost) / (current_amount+amount)
+    
         new_stock = current_stock + amount
 
         update_data = {
             "balance": new_balance,
-            club: new_stock
+            club: new_stock,
+            club+'_평균구매가': average_cost
         }
 
         update_demand = {
