@@ -7,11 +7,7 @@
     <title>ranking</title>
 </head>
 <body>
-    <nav class="upnavbar">
-        <div class="logo"></div>
-        <p style = 'margin: 0px 0px'><span style="color: #A6F4BC;">S</span>TOC<span style="color: #A6F4BC;">K</span>OLON!</p>    
-        <div class='navbar-username'>{{username}}</div>        
-    </nav> <br><br><br>
+    {% include "navbar/topnav.html" %} <br><br><br>
     <div class="container">
         <div class="ranking">
             <h1>Ranking</h1>
@@ -31,10 +27,7 @@
             </table>
         </div>
     </div>
-    <nav class="downnavbar">
-        <form action="/ranking"><button type="submit" class="ranking_icon"></button></form>
-        <form action="/home"><button type="submit" class="home_icon"></button></form>
-        <form action="/stock" method="get"><button type="submit" class="wallet_icon"></button></form>
-    </nav>
+    {% include "navbar/bottomnav.html" %}  
+
 </body>
 </html>

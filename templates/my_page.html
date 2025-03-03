@@ -62,11 +62,8 @@
 
 </script>
 
-<nav class="upnavbar">
-    <div class="logo"></div>
-    <p style = 'margin: 0px 0px'><span style="color: #A6F4BC;">S</span>TOC<span style="color: #A6F4BC;">K</span>OLON!</p>    
-    <div class='navbar-username'>{{username}}</div>        
-</nav>
+{% include "navbar/topnav.html" %}
+
 <div class="container">
     <div class="profile">
         <img class="profile_image" src="/static/images/Profile.png" alt="profile_image">
@@ -127,11 +124,7 @@
             {% endif%}
         {% endfor %}
     </div>
-<nav class="downnavbar">
-    <form action="/ranking"><button type="submit" class="ranking_icon"></button></form>
-    <form action="/home"><button type="submit" class="home_icon"></button></form>
-    <form action="/stock" method="get"><button type="submit" class="wallet_icon"></button></form>
-</nav>
+    {% include "navbar/bottomnav.html" %}
    
 </body>
 </html>

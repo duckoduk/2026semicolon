@@ -10,13 +10,7 @@
 </head>
 <body>
 
-    <nav class="upnavbar">
-        <div class="logo"></div>
-        <p><span style="color: #A6F4BC;">S</span>TOC<span style="color: #A6F4BC;">K</span>OLON!</p>    
-        <div class='navbar-username'>
-            {{username}}
-        </div>        
-    </nav>
+    {% include "navbar/topnav.html" %}
     <div class="container">
         <div class="details">
             <div class="club_logo"></div>
@@ -49,7 +43,7 @@
                 console.log('Fetched data:', data);
                 return data;
             }
-            
+
             async function renderChart() {
                 const stockData = await fetchStockData();
                 const ctx = document.getElementById('stockChart').getContext('2d');
@@ -103,7 +97,7 @@
                     }
                 });
             }
-            
+
             renderChart();
 
         </script>
@@ -161,10 +155,6 @@
         </div>
         <div class="poster">poster</div>
     </div>
-    <nav class="downnavbar">
-        <form action="/ranking"><button type="submit" class="ranking_icon"></button></form>
-        <form action="/home"><button type="submit" class="home_icon"></button></form>
-        <form action="/stock" method="get"><button type="submit" class="wallet_icon"></button></form>
-    </nav>
+    {% include "navbar/bottomnav.html" %}  
 </body>
 </html>

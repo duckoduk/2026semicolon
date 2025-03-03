@@ -8,13 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main_stock.css') }}">
 </head>
 <body>
-    <nav class="upnavbar">
-        <div class="logo"></div>
-        <p style = 'margin: 0px 0px'><span style="color: #A6F4BC;">S</span>TOC<span style="color: #A6F4BC;">K</span>OLON!</p>    
-        <div class='navbar-username'>
-            {{username}}
-        </div>        
-    </nav>
+    {% include "navbar/topnav.html" %}
     <br><br><br>
     <div class="contents" id="stock-container">
         {% for i in range(clubs | length) %}
@@ -33,10 +27,6 @@
     </div>
     <br><br><br>
     
-    <nav class="downnavbar">
-        <form action="/ranking"><button type="submit" class="ranking_icon"></button></form>
-        <form action="/home"><button type="submit" class="home_icon"></button></form>
-        <form action="/stock" method="get"><button type="submit" class="wallet_icon"></button></form>
-    </nav>
+    {% include "navbar/bottomnav.html" %}
 </body>
 </html>
