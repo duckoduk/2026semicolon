@@ -119,7 +119,27 @@
 
 <div class="container">
     <div class="profile">
-        <img class="profile_image" src="/static/images/Profile.png" alt="profile_image">
+        <div class="profile-image-container">
+            <img class="profile_image" src="/static/images/Profile.png" alt="profile_image">
+            <img class="edit-icon" src="/static/images/edit_icon.png" alt="edit_icon">
+            <input type="file" id="fileInput" accept="image/*" style="display: none;">
+            <script>
+            document.querySelector(".edit-icon").addEventListener("click", function() {
+                document.getElementById("fileInput").click();
+            });
+            
+            document.getElementById("fileInput").addEventListener("change", function(event) {
+                let file = event.target.files[0];
+                if (file) {
+                    let reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.querySelector(".profile_image").src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            </script>
+        </div>
         <div class="inform">
             <div class="profile-username"> 환영합니다! <br><br><h1>{{username}}</h1></div>
             <div class="wallet">

@@ -96,8 +96,8 @@ body::-webkit-scrollbar {
         margin: 10%;
     }
     .profile_image{
-        width: 50px;  
-        height: 50px;
+        width: 100px;  
+        height: 100px;
         border-radius: 50%;
         object-fit: cover; 
         margin: 5px 20px;
@@ -197,8 +197,8 @@ body::-webkit-scrollbar {
         margin: 10%;
     }
     .profile_image{
-        width: 50px;  
-        height: 50px;
+        width: 200px;  
+        height: 200px;
         border-radius: 50%;
         object-fit: cover; 
         margin: 5px 20px;
@@ -210,4 +210,37 @@ body::-webkit-scrollbar {
         padding-right: 10px;
     }
 
+    .profile-image-container {
+        position: relative;
+        display: inline-block;
+    }
+    
+    /*기본 프로필 이미지 */
+    .profile_image {
+        width: 200px;  /* 원하는 크기 */
+        height: 200px;
+        border-radius: 50%; /* 원형 유지 */
+    }
+
+    /*연필 아이콘 (프로필 사진과 같은 크기로 겹치기) */
+    .edit-icon {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 200px;  /* 프로필 사진과 동일한 크기 */
+        height: 200px;
+        border-radius: 50%;
+        opacity: 0; /* 기본적으로 숨김 */
+        transition: opacity 0.3s ease;
+    }
+    
+    /*마우스를 올리면 연필 아이콘이 나타남 */
+    .profile-image-container:hover .edit-icon {
+        opacity: 1;
+    }
+    
+    /*마우스를 올리면 프로필 사진이 살짝 어두워짐 */
+    .profile-image-container:hover .profile_image {
+        filter: brightness(0.6);
+    }
 }
