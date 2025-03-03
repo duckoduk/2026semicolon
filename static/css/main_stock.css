@@ -2,6 +2,9 @@ body{
     background-color: #EAEAEA;
     justify-content: center;
 }
+body::-webkit-scrollbar {
+    display: none;
+}
 @media screen and (max-width:800px){
     .upnavbar{
         position: fixed;
