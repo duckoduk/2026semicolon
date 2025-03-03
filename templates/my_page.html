@@ -120,38 +120,102 @@
 <div class="container">
     <div class="profile">
         <div class="profile-image-container">
-            <img class="profile_image" src="/static/images/Profile.png" alt="profile_image">
+            <!-- Flask에서 받은 pfp 값으로 초기 프로필 이미지 설정 -->
+            <img class="profile_image" src="/static/images/pfp/{{ pfp }}" alt="profile_image">
             <img class="edit-icon" src="/static/images/edit_icon.png" alt="edit_icon">
-        
-            <!-- 이미지 선택 모달 -->
-            <div id="imageSelectionModal" class="modal">
-                <div class="modal-content">
-                    <span class="close">&times;</span>
-                    <h3>프로필 사진 선택</h3>
-                    <div class="image-options">
-                        <img class="selectable-image" src="/static/images/pfp/Duck.png" alt="Duck">
-                        <img class="selectable-image" src="/static/images/pfp/Unicorn.png" alt="Unicorn">
-                    </div>
+        </div>
+    
+        <!-- 프로필 사진 선택 모달 -->
+        <div id="imageSelectionModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>프로필 사진 선택</h3>
+                <div class="image-options">
+                    <img class="selectable-image" src="/static/images/pfp/Duck.png" alt="Duck">
+                    <img class="selectable-image" src="/static/images/pfp/Unicorn.png" alt="Unicorn">
                 </div>
             </div>
         </div>
+    
         <script>
-            document.querySelector(".edit-icon").addEventListener("click", function() {
-                document.getElementById("imageSelectionModal").style.display = "block";
-            });
-            
-            document.querySelector(".close").addEventListener("click", function() {
-                document.getElementById("imageSelectionModal").style.display = "none";
-            });
-            
-            // 이미지 선택 시 프로필 변경
-            document.querySelectorAll(".selectable-image").forEach(img => {
-                img.addEventListener("click", function() {
-                    document.querySelector(".profile_image").src = this.src;
-                    document.getElementById("imageSelectionModal").style.display = "none";
+            // Flask에서 전달받은 데이터
+            const username = "{{ username }}";  // 사용자명
+            const pfp = "{{ pfp }}";  // DB에서 가져온 프로필 이미지 파일명
+    
+            // 페이지 로드 시 저장된 pfp 값이 있으면 프로필 이미지 업데이트
+            window.onload = function() {
+                console.log("Loaded profile picture:", pfp);
+                if (pfp) {
+                    document.querySelector(".profile_image").src = `/static/images/pfp/${pfp}`;
+                }
+            };
+    
+            async function updateProfilePicture(pfpFilename) {
+                try {
+                    const response = await fetch("/update_pfp", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            username: username,  // Flask에서 받은 username 사용
+                            pfp: pfpFilename
+                        })
+                    });
+    
+                    const result = await response.json();
+                    if (response.ok) {
+                        console.log("Profile picture updated:", result);
+                    } else {
+                        console.error("Error updating profile picture:", result);
+                    }
+                } catch (error) {
+                    console.error("Request failed:", error);
+                }
+            }
+    
+            document.addEventListener("DOMContentLoaded", function() {
+                const editIcon = document.querySelector(".edit-icon");
+                const modal = document.getElementById("imageSelectionModal");
+                const closeModal = document.querySelector(".close");
+    
+                if (editIcon && modal && closeModal) {
+                    // 편집 아이콘 클릭 시 모달 열기
+                    editIcon.addEventListener("click", function() {
+                        console.log("모달 열기 클릭됨");
+                        modal.style.display = "block";
+                    });
+    
+                    // 닫기 버튼 클릭 시 모달 닫기
+                    closeModal.addEventListener("click", function() {
+                        console.log("모달 닫기 클릭됨");
+                        modal.style.display = "none";
+                    });
+    
+                    // 모달 바깥 영역 클릭 시 닫기
+                    window.addEventListener("click", function(event) {
+                        if (event.target === modal) {
+                            console.log("모달 바깥 클릭됨");
+                            modal.style.display = "none";
+                        }
+                    });
+                } else {
+                    console.error("모달 요소가 존재하지 않습니다.");
+                }
+    
+                // 이미지 선택 시 프로필 변경 및 Flask API 호출
+                document.querySelectorAll(".selectable-image").forEach(img => {
+                    img.addEventListener("click", function() {
+                        const pfpFilename = this.src.split("/").pop();  // 이미지 파일명만 추출
+                        document.querySelector(".profile_image").src = this.src;
+                        document.getElementById("imageSelectionModal").style.display = "none";
+    
+                        // Flask 백엔드 API 호출 (Supabase에 저장)
+                        updateProfilePicture(pfpFilename);
+                    });
                 });
             });
-            </script>
+        </script>
         <div class="inform">
             <div class="profile-username"> 환영합니다! <br><br><h1>{{username}}</h1></div>
             <div class="wallet">

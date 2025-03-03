@@ -31,6 +31,7 @@ app.secret_key="secret_key"
 SUPABASE_URL="https://lwjodduasieisebkrusp.supabase.co"
 SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3am9kZHVhc2llaXNlYmtydXNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg2NDA0NjMsImV4cCI6MjA1NDIxNjQ2M30.3HaCNzho2G-mCYScAKVI2XuF4U24fSJqiVhEQZOtr4I"
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+supabase_client: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def convert_to_serializable(obj):
     """🔄 JSON 직렬화가 가능한 타입으로 변환"""
@@ -226,7 +227,14 @@ def home():
     stock = list(stock_data.data[0].keys() if stock_data.data else [])[4:44]
     stock_num = list(stock_data.data[0].values() if stock_data.data else [])[4:44]
     stock_price=list(stock_price_data.data[0].values() if stock_price_data.data else [])[2:]
-    return render_template('my_page.html', username=session['username'] , balance=balance.data[0]['balance'], total_assets=total_assets.data[0]['total_assets'], stock= stock, stock_num=stock_num, stock_price=stock_price)
+    # Supabase에서 해당 사용자의 pfp 값 가져오기
+    response = supabase_client.table("users").select("pfp").eq("username", session['username']).execute()
+
+    # `data`가 존재하면 `pfp` 값 가져오기
+    pfp = response.data[0]["pfp"] if response.data else "Profile.png"  # 기본 이미지 설정
+    return render_template('my_page.html', username=session['username'] , balance=balance.data[0]['balance'], total_assets=total_assets.data[0]['total_assets'], stock= stock, stock_num=stock_num, stock_price=stock_price, pfp=pfp)
+
+
 
 def get_description_by_club(club_name):
     # CSV 파일 경로와 인코딩(UTF-8)을 확인합니다.
@@ -472,7 +480,7 @@ def ranking():
 
     return render_template('ranking.html', username=session['username'], ranking=ranking)
 
-@app.route('/stock_data/<club>')
+@app.route('/stock_data/<club>') # 그래프
 def stock_data(club):
     response = supabase.table('stock_data') \
                        .select('timestamp, ' + club) \
@@ -489,6 +497,24 @@ def stock_data(club):
     prices = [row[club] for row in response.data]
 
     return jsonify({"dates": dates, "prices": prices})
+
+@app.route('/update_pfp', methods=['POST'])
+def update_pfp():
+    data = request.json
+    username = data.get("username")  # 클라이언트에서 받은 username
+    pfp = data.get("pfp")  # 선택한 프로필 이미지 파일명 (Duck.png 또는 Unicorn.png)
+
+    if not username or not pfp:
+        return jsonify({"error": "Missing username or pfp"}), 400
+
+    # Supabase에서 해당 사용자의 pfp 값을 업데이트
+    response = supabase_client.table("users").update({"pfp": pfp}).eq("username", username).execute()
+
+    # Supabase의 execute()는 (data, error) 튜플이 아닌 단일 객체를 반환하므로, 직접 확인
+    if "error" in response and response["error"]:
+        return jsonify({"error": str(response["error"])}), 500
+
+    return jsonify({"message": "Profile picture updated successfully"})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
