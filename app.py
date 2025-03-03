@@ -168,7 +168,12 @@ def dashboard():
         stock = list(stock_data.data[0].keys() if stock_data.data else [])[4:44]
         stock_num = list(stock_data.data[0].values() if stock_data.data else [])[4:44]
         stock_price=list(stock_price_data.data[0].values() if stock_price_data.data else [])[2:]
-        return render_template('my_page.html', username=session['username'] , balance=balance.data[0]['balance'], total_assets=total_assets.data[0]['total_assets'], stock= stock, stock_num=stock_num, stock_price=stock_price)
+        # Supabase에서 해당 사용자의 pfp 값 가져오기
+        response = supabase_client.table("users").select("pfp").eq("username", session['username']).execute()
+
+        # `data`가 존재하면 `pfp` 값 가져오기
+        pfp = response.data[0]["pfp"] if response.data else "Profile.png"  # 기본 이미지 설정
+        return render_template('my_page.html', username=session['username'] , balance=balance.data[0]['balance'], total_assets=total_assets.data[0]['total_assets'], stock= stock, stock_num=stock_num, stock_price=stock_price, pfp=pfp)
       
     else:
         return redirect(url_for("login"))
