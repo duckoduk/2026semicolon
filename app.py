@@ -11,6 +11,7 @@ from sqlalchemy import create_engine
 from datetime import datetime
 import numpy as np
 
+
 sigma = 0.7 #표준편차(변동성) 일단 2%
 k = 0.5 #기본 주식 가격 변동률(가중치) 일단 10%
 #비밀번호 암호화해서 저장
@@ -112,7 +113,7 @@ def update_stock_prices():
     print(f"✅ [{new_data['timestamp']}] 주식 가격 추가 완료!")
 # 🕒 스케줄러 설정: 10초마다 실행
 scheduler = BackgroundScheduler()
-scheduler.add_job(update_stock_prices, "interval", seconds=10000000)#test
+scheduler.add_job(update_stock_prices, "cron", hour='21,22', minute='*/10', second='30')#test
 scheduler.start()
 
 
