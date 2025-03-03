@@ -121,7 +121,7 @@ def index():
     return render_template('index.html')
     #return jsonify({"message": "연동"})
 
-@app.route('/go',methods=['POST'])
+@app.route('/go',methods=['POST', 'GET'])
 def go():
     return render_template('login.html')
 
@@ -148,7 +148,12 @@ def main():
             return render_template("login.html", response_pw="비밀번호가 일치하지 않습니다.", id=student_id)
     else:
         return render_template("login.html", response="아이디가 존재하지 않습니다.")
-    
+
+@app.route('/logout')
+def logout():
+    session.clear() 
+    return redirect(url_for("go"))
+
 @app.route('/dashboard')
 def dashboard():
     if 'user_id' in session:
@@ -163,11 +168,6 @@ def dashboard():
       
     else:
         return redirect(url_for("login"))
-    
-@app.route('/logout')
-def logout():
-    session.clear() 
-    return redirect(url_for("login"))
 
 @app.route('/register_data', methods=["POST"])
 def re_main():

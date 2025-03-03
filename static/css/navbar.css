@@ -1,21 +1,17 @@
 @media screen and (max-width:800px){
     .upnavbar {
-        position: fixed;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100%; /* 전체 너비 확보 */
-        max-width: 1200px; /* 최대 너비 제한 */
-        padding: 0 18%; /* 좌우 여백 추가 */
-        height: auto;
-        line-height: 7vh;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: white;
-        box-shadow: rgba(0, 0, 0, 0.25) 0px 7px 29px 0px;
-        border-radius: 0 0 10px 10px;
-        z-index: 100;
+        display: none; /* 모바일에서는 네비게이션 바 숨김 */
+        height: 1px;
+    }
+
+    .logo {
+        width: 40px;  /* 로고 크기 줄이기 */
+        height: 40px;
+    }
+
+    .logout-button {
+        font-size: 14px; /* 버튼 크기 줄이기 */
+        padding: 6px 12px;
     }
     .navbar-username {
         padding-right: 5%;
@@ -96,22 +92,43 @@
         top: 0;
         left: 50%;
         transform: translateX(-50%);
-        width: 100%; /* 전체 너비 확보 */
-        max-width: 1200px; /* 최대 너비 제한 */
-        padding: 0 18%; /* 좌우 여백 추가 */
-        height: auto;
-        line-height: 7vh;
+        width: 96%;
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: center; /* 세로 정렬 */
         background-color: white;
         box-shadow: rgba(0, 0, 0, 0.25) 0px 7px 29px 0px;
         border-radius: 0 0 10px 10px;
-        z-index: 100;
+        padding: 10px 20px;
+        z-index: 1000;
     }
-    📝 변경사항 설명
-    .navbar-username {
-        padding-right: 5%;
+    
+    /*오른쪽 섹션 스타일 */
+    .navbar-right {
+        display: flex;
+        align-items: center; /* 모든 요소를 같은 높이로 정렬 */
+        gap: 10px; /* 버튼과 텍스트 사이 간격 */
+    }
+    
+    /*로그아웃 버튼 스타일 */
+    .logout-button {
+        background-color: #ff4d4d; /* 빨간색 */
+        color: white;
+        padding: 10px 15px; /* 버튼 크기 균일하게 조정 */
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background 0.3s;
+        display: flex; /* 버튼 내부 정렬 */
+        align-items: center; /* 텍스트 수직 정렬 */
+        justify-content: center; /* 텍스트 가로 정렬 */
+        font-size: 14px;
+        height: 20px; /* 버튼 높이를 고정 */
+    }
+    
+    /*로그아웃 버튼 호버 효과 */
+    .logout-button:hover {
+        background-color: #e60000;
     }
     .downnavbar {
         position: fixed;
