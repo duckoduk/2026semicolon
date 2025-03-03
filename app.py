@@ -40,7 +40,9 @@ def convert_to_serializable(obj):
     return obj
 
 def profit_rate(cP, aP):
-    return f'{round((cP - aP) / aP, 2)}%'
+    if aP == 0:
+        return "0.00%"  # 평균 구매가가 없을 경우 수익률 0% 반환
+    return f"{((cP - aP) / aP) * 100:.2f}%"
 
 def update_stock_prices():
     """🔄 10초마다 주식 가격을 새로운 행으로 추가하여 기록"""
@@ -249,7 +251,7 @@ def process_buy_stock():
     trade = request.form.get('trade') #trade는 'buy'아니면 'sell'
     club = request.form.get('club')
     amount_str = request.form.get('amount')
-    print(club,'/' ,amount_str)
+
     if not club or not amount_str:
         return jsonify({"error":"club과 구매 수량이 필요합니다."}), 400
     try:
@@ -314,8 +316,9 @@ def process_buy_stock():
         new_balance = current_balance - total_cost
         current_stock = int(user_data.get(club, 0))
         average_cost = (average_cost*current_amount + total_cost) / (current_amount+amount)
-    
         new_stock = current_stock + amount
+
+        revenue_rate = profit_rate(current_stock, average_cost)
 
         update_data = {
             "balance": new_balance,
@@ -338,11 +341,10 @@ def process_buy_stock():
         update_response_demand = supabase.table('supply_demand') \
                                     .insert(update_demand) \
                                     .execute()
-        print(update_demand)
-        # if update_response.status_code != 200:
-            # return "계좌 업데이트에 실패했습니다.", 500
 
-        return jsonify({"message": f"매수 성공: '{club}' 주식 {amount}주를 {total_cost}원에 매수하였습니다."})
+
+        return jsonify({"message": f"매수 성공: '{club}' 주식 {amount}주를 {total_cost}원에 매수하였습니다.",
+                        "revenue_rate": revenue_rate})
 
     else: #trade ==sell
         if int(user_data.get(club, 0)) < amount:
