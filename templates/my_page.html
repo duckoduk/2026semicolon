@@ -122,24 +122,36 @@
         <div class="profile-image-container">
             <img class="profile_image" src="/static/images/Profile.png" alt="profile_image">
             <img class="edit-icon" src="/static/images/edit_icon.png" alt="edit_icon">
-            <input type="file" id="fileInput" accept="image/*" style="display: none;">
-            <script>
+        
+            <!-- 이미지 선택 모달 -->
+            <div id="imageSelectionModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h3>프로필 사진 선택</h3>
+                    <div class="image-options">
+                        <img class="selectable-image" src="/static/images/pfp/Duck.png" alt="Duck">
+                        <img class="selectable-image" src="/static/images/pfp/Unicorn.png" alt="Unicorn">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
             document.querySelector(".edit-icon").addEventListener("click", function() {
-                document.getElementById("fileInput").click();
+                document.getElementById("imageSelectionModal").style.display = "block";
             });
             
-            document.getElementById("fileInput").addEventListener("change", function(event) {
-                let file = event.target.files[0];
-                if (file) {
-                    let reader = new FileReader();
-                    reader.onload = function(e) {
-                        document.querySelector(".profile_image").src = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                }
+            document.querySelector(".close").addEventListener("click", function() {
+                document.getElementById("imageSelectionModal").style.display = "none";
+            });
+            
+            // 이미지 선택 시 프로필 변경
+            document.querySelectorAll(".selectable-image").forEach(img => {
+                img.addEventListener("click", function() {
+                    document.querySelector(".profile_image").src = this.src;
+                    document.getElementById("imageSelectionModal").style.display = "none";
+                });
             });
             </script>
-        </div>
         <div class="inform">
             <div class="profile-username"> 환영합니다! <br><br><h1>{{username}}</h1></div>
             <div class="wallet">
