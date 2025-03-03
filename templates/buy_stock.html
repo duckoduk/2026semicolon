@@ -44,45 +44,62 @@
         </div>
         <script>
             async function fetchStockData() {
-                const response = await fetch('/stock_data/{{ club }}');
-                const data = await response.json();
-                console.log('Fetched data:', data);
-                return data;
-            }
+    const response = await fetch('/stock_data/{{ club }}');
+    const data = await response.json();
+    console.log('Fetched data:', data);
+    return data;
+}
 
-            async function renderChart() {
-                const stockData = await fetchStockData();
-                const ctx = document.getElementById('stockChart').getContext('2d');
-                console.log('Rendering chart with data:', stockData);
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: stockData.dates.map((_, index) => index + 1),
-                        datasets: [{
-                            label: 'Stock Price',
-                            data: stockData.prices,
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 1,
-                            fill: false
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            x: {
-                                type: 'category',
-                                title: {
-                                    display: false // Hide the X-axis title
-                                }
-                            },
-                            y: {
-                                beginAtZero: false
-                            }
-                        }
+async function renderChart() {
+    const stockData = await fetchStockData();
+    const ctx = document.getElementById('stockChart').getContext('2d');
+    console.log('Rendering chart with data:', stockData);
+
+
+    function getSegmentColor(ctx) {
+        const index = ctx.p1DataIndex;
+        if (index === 0) return 'gray';
+        return stockData.prices[index] >= stockData.prices[index - 1] ? 'red' : 'blue';
+    }
+
+    const pointColors = stockData.prices.map((price, index) => {
+        if (index === 0) return 'gray';
+        return price >= stockData.prices[index - 1] ? 'red' : 'blue';
+    });
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: stockData.dates.map((_, index) => index + 1),
+            datasets: [{
+                label: 'Stock Price',
+                data: stockData.prices,
+                borderWidth: 2,
+                fill: false,
+                segment: {
+                    borderColor: ctx => getSegmentColor(ctx)
+                },
+                pointBackgroundColor: pointColors,
+                pointBorderColor: pointColors
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    type: 'category',
+                    title: {
+                        display: false
                     }
-                });
+                },
+                y: {
+                    beginAtZero: false
+                }
             }
+        }
+    });
+}
 
-            renderChart();
+renderChart();
         </script>
         <div class="buy_container">
             <div class="balance"><p>보유 자금: {{ "{:,}".format(balance|int) }}</p></div>

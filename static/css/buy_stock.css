@@ -91,7 +91,7 @@ body{
         margin: auto;
         min-width: 100px;
         height: 100px;
-        background: lightgray; /* 차트 자리 표시용 */
+        /* background: #F4F8FF; 차트 자리 표시용s */
         border-radius: 10px;
     }
     
@@ -249,7 +249,7 @@ body{
         margin-top: 1%;
         min-width: 100px;
         height: 100px;
-        background: lightgray; /* 차트 자리 표시용 */
+        /* background: ; 차트 자리 표시용 */
         border-radius: 10px;
     }
     
