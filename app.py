@@ -474,7 +474,7 @@ def stock_data(club):
     response = supabase.table('stock_data') \
                        .select('timestamp, ' + club) \
                        .order('timestamp', desc=True) \
-                       .limit(20) \
+                       .limit(30) \
                        .execute()
     if not response.data:
         return jsonify({"dates": [], "prices": []})
