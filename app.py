@@ -235,6 +235,14 @@ def get_description_by_club(club_name):
                 return [f"#{desc.strip()}" for desc in row['description'].split(',')]
     return None
 
+def get_longer_by_club(club_name):
+    with open('static/Club_detail_rows.csv', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if row['club_name'] == club_name:
+                return row['longer'].strip()  # `longer` 값 반환
+    return None
+
 @app.route('/buy_stock', methods=['POST'])
 def process_buy_stock():
     # 폼 데이터 받기
@@ -377,6 +385,7 @@ def process_buy_stock():
 @app.route('/buy_stock/<club>') #동아리 상세페이지
 def buy_stock(club):
     description = get_description_by_club(club)
+    longer = get_longer_by_club(club)
     balance = supabase.table('user_data').select('balance').eq('user_id', session['user_id']).execute() #user_data 테이블의 balance 열 중 user_id가 session['user_id']인 행을 가져옴
     clubs=['세미콜론','실험의숲','그레이스','뉴턴','다독다독','데이터무제한','디세뇨','디아리오','메시스트','빌리네어','소솜','심쿵','아리솔','에스쿱','에어로테크','엘리제','온에어','티아','파라미터','피지카스트로','하람','늘품','세븐일레븐','매드매쓰','도담','데카르트','수학에복종','아페토','메이키스','폴리머','라온제나','리사','아스클레오피스','수북수북','아이티아이','럭스','쿠데타','헥사곤','개벽','혜윰']
     # 최근 데이터를 timestamp를 기준으로 내림차순 정렬하여 첫 번째 row만 가져옵니다.
@@ -395,7 +404,7 @@ def buy_stock(club):
     else:
         stock_value = None
 
-    return render_template('buy_stock.html', clubs=clubs, club = club, description=description,stock_value=stock_value, balance=balance.data[0]['balance'])
+    return render_template('buy_stock.html', clubs=clubs, club = club, description=description,stock_value=stock_value, balance=balance.data[0]['balance'], longer = longer)
 
 
 @app.route('/stock') #전체 주식 보기 페이지
