@@ -21,6 +21,9 @@ body {
     font-family: 's2';
     overflow: hidden; /*스크롤바 없애기*/
 }
+body::-webkit-scrollbar {
+    display: none;
+}
 /* 모바일 기준 화면 */
 @media screen and (max-width: 800px) {
     #pentagon{

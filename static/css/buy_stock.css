@@ -1,6 +1,9 @@
 body{
     background-color: #EAEAEA;
 }
+body::-webkit-scrollbar {
+    display: none;
+}
 @media screen and (max-width:800px){
     .container {
  

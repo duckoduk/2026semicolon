@@ -220,8 +220,8 @@ def home():
     total_assets = supabase.table('user_data').select('total_assets').eq('user_id', session['user_id']).execute() #user_data 테이블의 total_assets 열 중 user_id가 session['user_id']인 행을 가져옴
     stock_data = supabase.table('user_data').select('*').eq('user_id', session['user_id']).execute()
     stock_price_data = supabase.table('stock_data').select('*').order('id', desc=True).limit(1).execute()
-    stock = list(stock_data.data[0].keys() if stock_data.data else [])[4:]
-    stock_num = list(stock_data.data[0].values() if stock_data.data else [])[4:]
+    stock = list(stock_data.data[0].keys() if stock_data.data else [])[4:44]
+    stock_num = list(stock_data.data[0].values() if stock_data.data else [])[4:44]
     stock_price=list(stock_price_data.data[0].values() if stock_price_data.data else [])[2:]
     return render_template('my_page.html', username=session['username'] , balance=balance.data[0]['balance'], total_assets=total_assets.data[0]['total_assets'], stock= stock, stock_num=stock_num, stock_price=stock_price)
 
