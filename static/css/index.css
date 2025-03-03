@@ -20,6 +20,10 @@ body {
     justify-content: center;
     font-family: 's2';
     overflow: hidden; /*스크롤바 없애기*/
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 body::-webkit-scrollbar {
     display: none;

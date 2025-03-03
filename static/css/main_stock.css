@@ -1,6 +1,10 @@
 body{
     background-color: #EAEAEA;
     justify-content: center;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 body::-webkit-scrollbar {
     display: none;

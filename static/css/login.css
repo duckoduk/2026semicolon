@@ -5,6 +5,10 @@ body{
     align-items: center;
     min-height: 100vh;
     background-color: #F7F7F7;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 body::-webkit-scrollbar {
     display: none;

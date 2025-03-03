@@ -2,6 +2,10 @@ body{
     background-color: #EAEAEA;
     padding-bottom: 70px; /* 네비게이션 바와 겹치는 문제 해결 */
     padding-top: 50px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 body::-webkit-scrollbar {
     display: none;
