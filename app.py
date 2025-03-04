@@ -289,14 +289,14 @@ def process_buy_stock():
     try:
         price = float(recent_data[club])
     except ValueError:
-        return jsonify({"주식 가격 데이터에 오류가 있습니다."}), 400
+        return jsonify({f"주식 가격 데이터에 오류가 있습니다."}), 400
 
     total_cost = price * amount
 
     # 세션에서 로그인된 사용자의 user_id 가져오기
     user_id = session.get('user_id')
     if not user_id:
-        return jsonify({"로그인된 사용자가 없습니다."}), 401
+        return jsonify({f"로그인된 사용자가 없습니다."}), 401
 
     # user_data 테이블에서 user_id로 사용자 데이터 조회
     user_response = supabase.table('user_data') \
@@ -304,26 +304,26 @@ def process_buy_stock():
                             .eq("user_id", user_id) \
                             .execute()
     if not user_response.data:
-        return jsonify({"사용자 데이터를 찾을 수 없습니다."}), 404
+        return jsonify({f"사용자 데이터를 찾을 수 없습니다."}), 404
 
     user_data = user_response.data[0]
     try:
         current_balance = float(user_data['balance'])
     except ValueError:
-        return jsonify({"계좌 잔액 데이터 오류"}), 400
+        return jsonify({f"계좌 잔액 데이터 오류"}), 400
 
     try:
         average_cost = float(user_data[club+'_평균구매가'])
     except ValueError:
-        return jsonify({"평균 매수가 데이터 오류"}), 400
+        return jsonify({f"평균 매수가 데이터 오류"}), 400
     
     try:
         current_amount = int(user_data[club])
     except ValueError:
-        return jsonify({"주식 보유량 데이터 오류"}), 400
+        return jsonify({f"주식 보유량 데이터 오류"}), 400
 
     if current_balance < total_cost:
-        return jsonify({"잔액이 부족합니다."}), 400
+        return jsonify({f"잔액이 부족합니다."}), 400
 
     if trade=="buy":
         # 잔액 차감 및 해당 클럽의 보유 주식 수 업데이트
@@ -335,9 +335,9 @@ def process_buy_stock():
         revenue_rate = profit_rate(current_stock, average_cost)
 
         update_data = {
-            "balance": new_balance,
+            "balance": int(new_balance+0.5),
             club: new_stock,
-            club+'_평균구매가': average_cost
+            club+'_평균구매가': int(average_cost+0.5)
         }
 
         update_demand = {
@@ -356,7 +356,7 @@ def process_buy_stock():
                                     .insert(update_demand) \
                                     .execute()
 
-
+        print(f"매수 성공: '{club}' 주식 {amount}주를 {total_cost}원에 매수하였습니다.")
         return jsonify({"message": f"매수 성공: '{club}' 주식 {amount}주를 {total_cost}원에 매수하였습니다.",
                         "revenue_rate": revenue_rate})
 

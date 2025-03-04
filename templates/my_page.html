@@ -31,86 +31,33 @@
         }
     }
     document.addEventListener("DOMContentLoaded", function () {
-            // 각 버튼에 이벤트 리스너 추가
-        document.querySelectorAll(".buy_bt, .sell_bt").forEach(button => {
-            button.addEventListener("click", function (event) {
-                event.preventDefault();  // 기본 폼 제출 방지
+    document.querySelectorAll(".buy_bt, .sell_bt").forEach(button => {
+        button.addEventListener("click", function (event) {
+            event.preventDefault();  // 기본 폼 제출 방지
 
-                const form = event.target.closest("form");
-                const formData = new FormData(form);
+            const form = event.target.closest("form");
+            const formData = new FormData(form);
 
-                // 폼 데이터를 서버에 전송
-                fetch(form.action, {
-                    method: form.method,
-                    body: formData
-                })
-                .then(response => response.json()) // JSON 형태로 응답을 받음
-                .then(data => {
-                    if (data.message) {
-                        alert(data.message); // Flask에서 보낸 메시지를 alert으로 출력
-                        
-                        // 수익률 업데이트
-                        if (data.revenue_rate) {
-                            const stockInfo = form.closest(".contents").querySelector(".club_info");
-                            const resultRevenue = stockInfo.querySelector(".result-revenue");
-                            if (resultRevenue) {
-                                resultRevenue.textContent = `수익률: ${data.revenue_rate}%`;  // 수익률 업데이트
-                            }
-                        }
-                    } else {
-                        alert("서버 응답 형식 오류!");
-                    }
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    alert("요청 처리 중 오류가 발생했습니다.");
-                });
-            });
-        });
-
-        // 총액 계산 함수
-        function calculate(event) {
-            const form = event.target.closest("form");  // 현재 입력 필드가 속한 form 찾기
-            if (!form) return;
-
-            const stockValueElement = form.closest(".contents").querySelector("#stock_value"); 
-            const stockValue = parseFloat(stockValueElement.textContent.trim()); // 현재 주식 가격
-            const amount = parseFloat(event.target.value);  // 입력한 수량
-
-            const resultDisplay = form.querySelector(".result"); // 결과 표시 영역
-
-            if (!isNaN(stockValue) && !isNaN(amount)) {    
-                const totalAmount = stockValue * amount;
-                resultDisplay.textContent = totalAmount.toLocaleString(); // 총액 계산 후 출력
-            } else {
-                resultDisplay.textContent = "올바른 숫자를 입력하세요!";
-            }
-        }
-
-        // 수량 입력 시 총액 계산
-        document.querySelectorAll(".quantity-input").forEach(input => {
-            input.addEventListener("input", calculate);
-        });
-
-        // 예시: '추가매수' 버튼 클릭 시 매수 요청
-        document.querySelector("#buyStockButton").addEventListener("click", function() {
-            let formData = new FormData();
-            formData.append("trade", "buy");
-            formData.append("club", "세미콜론");  // 클럽명 예시
-            formData.append("amount", "10");  // 수량 예시
-
-            fetch("/buy_stock", {
-                method: "POST",
+            fetch(form.action, {
+                method: form.method,
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => response.json()) // JSON 형태로 응답을 받음
             .then(data => {
-                alert(data.message); // 매수 성공 메시지 표시
-                document.getElementById("averageCost").innerText = `평균 매수가: ${data.average_cost} 원`; // 평균 매수가 갱신
+                if (data.message) {
+                    alert(data.message); // Flask에서 보낸 메시지를 alert으로 출력
+                } else {
+                    alert("서버 응답 형식 오류!");
+                }
             })
-            .catch(error => console.error("Error:", error));
+            .catch(error => {
+                console.error("Error:", error);
+                alert("요청 처리 중 오류가 발생했습니다.");
+            });
         });
     });
+});
+
 
 
 </script>
@@ -244,7 +191,7 @@
                             <p>보유 수량 : {{stock_num[i]}} </p>
                             <p >현재가격 : <span id="stock_value">{{stock_price[i]}}</span></p>
                             <p>총 가치 : {{stock_price[i]*stock_num[i]}} </p>
-                            <p>수익률 : <span class="result-revenue">SAMPLE</span></p> <!-- 나중에 SAMPLE 지울것! 일단 테스트용 -->
+                            <p>수익률 : SAMPLE</p> <!-- 나중에 SAMPLE 지울것! 일단 테스트용 -->
                         </div>
                     </div>
                     <div class="inputs" style="display: flex; margin-top: 15px;">
