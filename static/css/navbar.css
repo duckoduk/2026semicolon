@@ -113,6 +113,7 @@
         border: none;  /* 버튼 테두리 제거 */
         background-color: transparent; /* 배경색 제거 */
     }
+
 }
 
 
@@ -233,6 +234,15 @@
         font-size: 12px;
         margin-right: 40px;
     }
-    
+    .logout-icon{
+        width: 20px;  
+        height: 20px;
+        margin: 0px 20px;
+        display: inline-block;
+    }
+    .logout_-text{
+        display: none;
+
+    }
 }
     

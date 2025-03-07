@@ -11,7 +11,7 @@ from sqlalchemy import create_engine
 from datetime import datetime
 import numpy as np
 
-
+profit_value=[] #수익률 저장장
 sigma = 0.7 #표준편차(변동성) 일단 2%
 k = 0.5 #기본 주식 가격 변동률(가중치) 일단 10%
 #비밀번호 암호화해서 저장
@@ -47,6 +47,8 @@ def profit_rate(cP, aP):
     return f"{((cP - aP) / aP) * 100:.2f}%"
 
 def update_stock_prices():
+    global profit_value
+    profit_value=[]
     """🔄 10초마다 주식 가격을 새로운 행으로 추가하여 기록"""
     # 📥 Supabase에서 가장 최근 데이터 가져오기
     response = supabase.table("stock_data") \
@@ -61,6 +63,10 @@ def update_stock_prices():
                                      .execute()
     supply_demand = response_supply_demand.data
 
+    response_user_data = supabase.table("user_data")\
+                                 .select("*")\
+                                    .execute()
+    user_data = response_user_data.data
     if not records or not supply_demand:
         print("⚠️ 테이블에 데이터가 없습니다.")
         return
@@ -79,13 +85,24 @@ def update_stock_prices():
             epsilon = np.random.normal(0, sigma)
             demand = [int(row['demand']) for row in supply_demand if row['club_name'] == col]
             supply = [int(row['supply']) for row in supply_demand if row['club_name'] == col]
+            average_cost = user_data[-1].get(col+'_평균구매가', 0) #,0은 평균 구매가가 없을 경우 0으로 반환
+            current_stock = user_data[-1].get(col, 0)
             non_zero_supply = max(sum(supply), 1)  # 0으로 나누는 오류 방지
             new_price = base_price*(sum(demand)/non_zero_supply)**k * np.exp(epsilon) +1
-            print(f"k={k} demand={demand}, supply={supply}")
-            print(f"k={k}기존 가격: {base_price}, 변동 비율: {(sum(demand) / non_zero_supply) ** k}, 최종 변동: {np.exp(epsilon)}")
-            print(new_price)
+            #print(f"k={k} demand={demand}, supply={supply}")
+            #print(f"k={k}기존 가격: {base_price}, 변동 비율: {(sum(demand) / non_zero_supply) ** k}, 최종 변동: {np.exp(epsilon)}")
+            #print(new_price)
+            revenue_rate = profit_rate(current_stock, average_cost)
+            print((f'average_cost: {average_cost}, current_stock: {current_stock}, profit_rate: {revenue_rate}'))
+            profit_value.append(revenue_rate)
+            print(f'수익률 추가!{profit_value}')
         else:
             new_price = max(int(base_price) + random.randint(-2000, 2000), 1000)
+            revenue_rate = profit_rate(current_stock, average_cost)
+            print(col)
+            print((f'average_cost: {average_cost}, current_stock: {current_stock}, profit_rate: {revenue_rate}'))
+            profit_value.append(revenue_rate)
+            print(f'수익률 추가!{profit_value}')
         new_data[col] = int(new_price)  # int64 → int 변환
     #supply_demand 초기화
     supabase.table("supply_demand").delete().gt("id", 0).execute()
@@ -112,9 +129,10 @@ def update_stock_prices():
     supabase.table("stock_data").insert(new_data).execute()
 
     print(f"✅ [{new_data['timestamp']}] 주식 가격 추가 완료!")
+
 # 🕒 스케줄러 설정: 10초마다 실행
 scheduler = BackgroundScheduler()
-scheduler.add_job(update_stock_prices, "cron", hour='21,22', minute='*/10', second='30')#test
+scheduler.add_job(update_stock_prices, "cron", hour='20,21,22', minute='*/1', second='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59')#test
 scheduler.start()
 
 
@@ -170,10 +188,11 @@ def dashboard():
         stock_price=list(stock_price_data.data[0].values() if stock_price_data.data else [])[2:]
         # Supabase에서 해당 사용자의 pfp 값 가져오기
         response = supabase_client.table("users").select("pfp").eq("username", session['username']).execute()
-
+        #전역변수 profitvalue 불러오기
+        print(f'수익률 불러오기!{profit_value}')
         # `data`가 존재하면 `pfp` 값 가져오기
         pfp = response.data[0]["pfp"] if response.data else "Profile.png"  # 기본 이미지 설정
-        return render_template('my_page.html', username=session['username'] , balance=balance.data[0]['balance'], total_assets=total_assets.data[0]['total_assets'], stock= stock, stock_num=stock_num, stock_price=stock_price, pfp=pfp)
+        return render_template('my_page.html', username=session['username'] , balance=balance.data[0]['balance'], total_assets=total_assets.data[0]['total_assets'], stock= stock, stock_num=stock_num, stock_price=stock_price, pfp=pfp, profit_value=profit_value)
       
     else:
         return redirect(url_for("login"))
@@ -237,7 +256,7 @@ def home():
 
     # `data`가 존재하면 `pfp` 값 가져오기
     pfp = response.data[0]["pfp"] if response.data else "Profile.png"  # 기본 이미지 설정
-    return render_template('my_page.html', username=session['username'] , balance=balance.data[0]['balance'], total_assets=total_assets.data[0]['total_assets'], stock= stock, stock_num=stock_num, stock_price=stock_price, pfp=pfp)
+    return render_template('my_page.html', username=session['username'] , balance=balance.data[0]['balance'], total_assets=total_assets.data[0]['total_assets'], stock= stock, stock_num=stock_num, stock_price=stock_price, pfp=pfp, profit_value=profit_value)
 
 
 
@@ -332,8 +351,6 @@ def process_buy_stock():
         average_cost = (average_cost*current_amount + total_cost) / (current_amount+amount)
         new_stock = current_stock + amount
 
-        revenue_rate = profit_rate(current_stock, average_cost)
-
         update_data = {
             "balance": int(new_balance+0.5),
             club: new_stock,
@@ -357,9 +374,7 @@ def process_buy_stock():
                                     .execute()
 
         print(f"매수 성공: '{club}' 주식 {amount}주를 {total_cost}원에 매수하였습니다.")
-        return jsonify({"message": f"매수 성공: '{club}' 주식 {amount}주를 {total_cost}원에 매수하였습니다.",
-                        "revenue_rate": revenue_rate})
-
+        return jsonify({"message": f"매수 성공: '{club}' 주식 {amount}주를 {total_cost}원에 매수하였습니다."})
     else: #trade ==sell
         if int(user_data.get(club, 0)) < amount:
             return jsonify({"보유 주식이 부족합니다."}), 400  # 매도 수량 검증 추가
