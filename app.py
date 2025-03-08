@@ -11,9 +11,8 @@ from sqlalchemy import create_engine
 from datetime import datetime
 import numpy as np
 
-profit_value=[] #수익률 저장장
 sigma = 0.7 #표준편차(변동성) 일단 2%
-k = 0.5 #기본 주식 가격 변동률(가중치) 일단 10%
+price_limit=2000 #가격 변동 범위 -2000 ~ 2000
 #비밀번호 암호화해서 저장
 #근뎅 bcrypt첨 해봐서 뭔지 잘 모르겟엉
 def hashing(pw):
@@ -41,10 +40,10 @@ def convert_to_serializable(obj):
         return obj.isoformat()
     return obj
 
-def profit_rate(cP, aP):
-    if aP == 0:
+def profit_rate(currentPrice, averagePrice): #my_page용 (main_stock.html아님 주의)
+    if averagePrice == 0:
         return "0.00%"  # 평균 구매가가 없을 경우 수익률 0% 반환
-    return f"{((cP - aP) / aP) * 100:.2f}%"
+    return f"{((currentPrice - averagePrice) / averagePrice) * 100:.2f}%"
 
 def update_stock_prices():
     global profit_value
@@ -58,77 +57,31 @@ def update_stock_prices():
                        .execute()
     records = response.data
 
-    response_supply_demand = supabase.table("supply_demand")\
-                                     .select("*")\
-                                     .execute()
-    supply_demand = response_supply_demand.data
+    response_user = supabase.table("user_data") \
+                            .select("*") \
+                            .order("user_id", desc=True) \
+                            .limit(1) \
+                            .execute()
+    records_user = response_user.data
 
-    response_user_data = supabase.table("user_data")\
-                                 .select("*")\
-                                    .execute()
-    user_data = response_user_data.data
-    if not records or not supply_demand:
+    if not records or not records_user:
         print("⚠️ 테이블에 데이터가 없습니다.")
         return
 
    # 최근 데이터를 DataFrame으로 변환
     df = pd.DataFrame(records)
-    #랜덤 변동성(정규분포)
-    # ✅ 새 데이터 생성
-    new_data = {"timestamp": datetime.now().isoformat()}
-    club_name=set([row['club_name'] for row in supply_demand])
-    # ✅ 가격 변동 적용 (-2000 ~ +2000)
+ 
     for col in df.columns[2:]:  # id, timestamp 제외
-        base_price = df.iloc[0][col]
-        if col in club_name:
-            print(col)
-            epsilon = np.random.normal(0, sigma)
-            demand = [int(row['demand']) for row in supply_demand if row['club_name'] == col]
-            supply = [int(row['supply']) for row in supply_demand if row['club_name'] == col]
-            average_cost = user_data[-1].get(col+'_평균구매가', 0) #,0은 평균 구매가가 없을 경우 0으로 반환
-            current_stock = user_data[-1].get(col, 0)
-            non_zero_supply = max(sum(supply), 1)  # 0으로 나누는 오류 방지
-            new_price = base_price*(sum(demand)/non_zero_supply)**k * np.exp(epsilon) +1
-            #print(f"k={k} demand={demand}, supply={supply}")
-            #print(f"k={k}기존 가격: {base_price}, 변동 비율: {(sum(demand) / non_zero_supply) ** k}, 최종 변동: {np.exp(epsilon)}")
-            #print(new_price)
-            revenue_rate = profit_rate(current_stock, average_cost)
-            print((f'average_cost: {average_cost}, current_stock: {current_stock}, profit_rate: {revenue_rate}'))
-            profit_value.append(revenue_rate)
-            print(f'수익률 추가!{profit_value}')
-        else:
-            new_price = max(int(base_price) + random.randint(-2000, 2000), 1000)
-            revenue_rate = profit_rate(current_stock, average_cost)
-            print(col)
-            print((f'average_cost: {average_cost}, current_stock: {current_stock}, profit_rate: {revenue_rate}'))
-            profit_value.append(revenue_rate)
-            print(f'수익률 추가!{profit_value}')
-        new_data[col] = int(new_price)  # int64 → int 변환
-    #supply_demand 초기화
-    supabase.table("supply_demand").delete().gt("id", 0).execute()
-    #test supplydemand에 임의의 값 추가------------------------------------------------------------------
-    random_test_case1={
-        "user_id":1, 
-        "club_name" :'세미콜론',
-        "supply": random.randint(1,500),
-        "demand": random.randint(1,500)
-    }
-    random_test_case2={
-        "user_id":1, 
-        "club_name" :'실험의숲',
-        "supply": random.randint(1,500),
-        "demand": random.randint(1,500)
-    }
-    supabase.table("supply_demand").insert(random_test_case1).execute()
-    supabase.table("supply_demand").insert(random_test_case2).execute()
-    #---------------------------------------------------------------------------------------------------
-    # ✅ 모든 값 직렬화 가능하도록 변환
-    new_data = {k: convert_to_serializable(v) for k, v in new_data.items()}
+        df[col] = df[col].apply(lambda x: max(x + int(np.random.normal(0, sigma * price_limit)), 1000)) #랜덤 안하고 이런식으로 하면 되지 않음?
+    
+    # ✅ timestamp 업데이트
+    df["timestamp"] = datetime.now().isoformat()
 
-    # 🔄 Supabase에 **새로운 행 추가**
-    supabase.table("stock_data").insert(new_data).execute()
+    # 🔄 Supabase에 업데이트 적용(for문 없이 한꺼번에 저장하기)
+    exclude_id = df.drop(columns=["id"], errors="ignore") # id 열은 제외하고 업데이트(디버깅)
+    supabase.table("stock_data").insert(exclude_id.to_dict(orient="records")).execute()
 
-    print(f"✅ [{new_data['timestamp']}] 주식 가격 추가 완료!")
+    print(f"✅ [{datetime.now()}] 주식 가격 업데이트 완료!")
 
 # 🕒 스케줄러 설정: 10초마다 실행
 scheduler = BackgroundScheduler()
@@ -186,6 +139,8 @@ def dashboard():
         stock = list(stock_data.data[0].keys() if stock_data.data else [])[4:44]
         stock_num = list(stock_data.data[0].values() if stock_data.data else [])[4:44]
         stock_price=list(stock_price_data.data[0].values() if stock_price_data.data else [])[2:]
+        average_price = list(stock_data.data[0].values() if stock_data.data else [])[44:]
+        profit_value = [profit_rate(stock_price[i], average_price[i]) for i in range(len(stock_price))]  # 수익률 계산
         # Supabase에서 해당 사용자의 pfp 값 가져오기
         response = supabase_client.table("users").select("pfp").eq("username", session['username']).execute()
         #전역변수 profitvalue 불러오기
@@ -251,11 +206,13 @@ def home():
     stock = list(stock_data.data[0].keys() if stock_data.data else [])[4:44]
     stock_num = list(stock_data.data[0].values() if stock_data.data else [])[4:44]
     stock_price=list(stock_price_data.data[0].values() if stock_price_data.data else [])[2:]
+    average_price = list(stock_data.data[0].values() if stock_data.data else [])[44:]
+    profit_value = [profit_rate(stock_price[i], average_price[i]) for i in range(len(stock_price))]  # 수익률 계산
     # Supabase에서 해당 사용자의 pfp 값 가져오기
     response = supabase_client.table("users").select("pfp").eq("username", session['username']).execute()
-
     # `data`가 존재하면 `pfp` 값 가져오기
     pfp = response.data[0]["pfp"] if response.data else "Profile.png"  # 기본 이미지 설정
+
     return render_template('my_page.html', username=session['username'] , balance=balance.data[0]['balance'], total_assets=total_assets.data[0]['total_assets'], stock= stock, stock_num=stock_num, stock_price=stock_price, pfp=pfp, profit_value=profit_value)
 
 
@@ -330,11 +287,6 @@ def process_buy_stock():
         current_balance = float(user_data['balance'])
     except ValueError:
         return jsonify({f"계좌 잔액 데이터 오류"}), 400
-
-    try:
-        average_cost = float(user_data[club+'_평균구매가'])
-    except ValueError:
-        return jsonify({f"평균 매수가 데이터 오류"}), 400
     
     try:
         current_amount = int(user_data[club])
@@ -343,6 +295,11 @@ def process_buy_stock():
 
     if current_balance < total_cost:
         return jsonify({f"잔액이 부족합니다."}), 400
+    
+    try:
+        average_cost = float(user_data[club+'_평균구매가'])
+    except ValueError:
+        return jsonify({f"평균 매수가 데이터 오류"}), 400
 
     if trade=="buy":
         # 잔액 차감 및 해당 클럽의 보유 주식 수 업데이트
@@ -357,24 +314,14 @@ def process_buy_stock():
             club+'_평균구매가': int(average_cost+0.5)
         }
 
-        update_demand = {
-            "club_name" : club,
-            "supply" : 0,
-            "demand" : amount,
-            "user_id" : user_id #유저 아이디 추가 -> 보안용(대조군 생성성)
-        }
-
         update_response = supabase.table('user_data') \
                                 .update(update_data) \
                                 .eq("user_id", user_id) \
                                 .execute()
         
-        update_response_demand = supabase.table('supply_demand') \
-                                    .insert(update_demand) \
-                                    .execute()
-
         print(f"매수 성공: '{club}' 주식 {amount}주를 {total_cost}원에 매수하였습니다.")
         return jsonify({"message": f"매수 성공: '{club}' 주식 {amount}주를 {total_cost}원에 매수하였습니다."})
+    
     else: #trade ==sell
         if int(user_data.get(club, 0)) < amount:
             return jsonify({"보유 주식이 부족합니다."}), 400  # 매도 수량 검증 추가
@@ -388,22 +335,12 @@ def process_buy_stock():
             club: new_stock
         }
 
-        update_demand = {
-            "club_name" : club,
-            "supply" : amount,
-            "demand" : 0,
-            "user_id" : user_id #유저 아이디 추가 -> 보안용(대조군 생성성)
-        }
 
         update_response = supabase.table('user_data') \
                                 .update(update_data) \
                                 .eq("user_id", user_id) \
                                 .execute()
         
-        update_response_demand = supabase.table('supply_demand') \
-                                    .insert(update_demand) \
-                                    .execute()
-        print(update_demand)
         # if update_response.status_code != 200:
             # return "계좌 업데이트에 실패했습니다.", 500
 
@@ -444,6 +381,7 @@ def my_page():
 
     club_price_DB= supabase.table('stock_data').select('*').order('id', desc=True).limit(1).execute()
     club_price = list(club_price_DB.data[0].values()) if club_price_DB.data else []
+    
     return render_template('main_stock.html', username=session['username'], clubs=clubs, club_price=club_price)
 
 @app.route('/extra_buy', methods=['POST'])
