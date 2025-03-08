@@ -13,7 +13,7 @@
     {% include "navbar/topnav.html" %}
     <div class="container">
         <div class="details">
-            <div class="club_logo"></div>
+            <img src="/static/images/logos/semicolon.png" alt="logo" class="club_logo">
             <div class="info">
                 <h1>{{ club }}</h1>
                 <div class="tags">
@@ -29,76 +29,108 @@
                 <p>{{ longer }}</p>
             </div>
         </div>
-        <div class="price">
-            <span id="stock_value">{{ stock_value }}</span>
-            <p style="color: green;">+0.05%</p> 
+        <div class="price" style="display: flex; gap: 5%;">
+            <h1><span id="stock_value">{{ stock_value }}₩</span></h1>
+            <p style="color: green; display: flex; justify-content: center; align-items: center;">{{profit_value}}</p> 
         </div>
         <div class="chart" style="height: auto;">
             <canvas id="stockChart" style="width: 100%; height: 400px;"></canvas>
         </div>
         <script>
-            async function fetchStockData() {
-                const response = await fetch('/stock_data/{{ club }}');
-                const data = await response.json();
-                console.log('Fetched data:', data);
-                return data;
-            }
+async function fetchStockData() {
+    const response = await fetch('/stock_data/{{ club }}');
+    const data = await response.json();
+    console.log('Fetched data:', data);
+    return data;
+}
 
-            async function renderChart() {
-                const stockData = await fetchStockData();
-                const ctx = document.getElementById('stockChart').getContext('2d');
-                console.log('Rendering chart with data:', stockData);
-            
-            
-                function getSegmentColor(ctx) {
-                    const index = ctx.p1DataIndex;
-                    if (index === 0) return 'gray';
-                    return stockData.prices[index] >= stockData.prices[index - 1] ? 'red' : 'blue';
-                }
-            
-            
-                const pointColors = stockData.prices.map((price, index) => {
-                    if (index === 0) return 'gray';
-                    return price >= stockData.prices[index - 1] ? 'red' : 'blue';
-                });
-            
-                const borderWidth = 2;
-            
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: stockData.dates.map((_, index) => index + 1),
-                        datasets: [{
-                            label: 'Stock Price',
-                            data: stockData.prices,
-                            borderWidth: borderWidth,
-                            fill: false,
-                            segment: {
-                                borderColor: ctx => getSegmentColor(ctx)
-                            },
-                            pointBackgroundColor: pointColors,
-                            pointBorderColor: pointColors,
-                            pointRadius: borderWidth,
-                            pointHoverRadius: borderWidth
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            x: {
-                                type: 'category',
-                                title: {
-                                    display: false
-                                }
-                            },
-                            y: {
-                                beginAtZero: false
-                            }
+async function renderChart() {
+    const stockData = await fetchStockData();
+    const ctx = document.getElementById('stockChart').getContext('2d');
+    console.log('Rendering chart with data:', stockData);
+
+    // 그라데이션 설정
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400); // 그라데이션의 방향 (세로 방향)
+    gradient.addColorStop(0, 'rgba(255, 99, 132, 0.2)'); // 빨간색 그라데이션
+    gradient.addColorStop(1, 'rgba(54, 162, 235, 0.2)'); // 파란색 그라데이션
+
+    // 색상 결정 함수
+    function getSegmentColor(ctx) {
+        const index = ctx.p1DataIndex;
+        if (index === 0) return 'gray';
+        return stockData.prices[index] >= stockData.prices[index - 1] ? 'red' : 'blue';
+    }
+
+    const pointColors = stockData.prices.map((price, index) => {
+        if (index === 0) return 'gray';
+        return price >= stockData.prices[index - 1] ? 'red' : 'blue';
+    });
+
+    const borderWidth = 2;
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: stockData.dates.map((_, index) => index + 1),
+            datasets: [{
+                label: 'Stock Price',
+                data: stockData.prices,
+                borderWidth: borderWidth,
+                fill: true, // 채우기 활성화
+                backgroundColor: gradient, // 배경에 그라데이션 적용
+                segment: {
+                    borderColor: ctx => getSegmentColor(ctx), // 각 구간의 색상
+                },
+                pointBackgroundColor: pointColors,
+                pointBorderColor: pointColors,
+                pointRadius: 2, // 포인트 크기 줄이기
+                pointHoverRadius: 6, // 포인트 호버 시 크기
+                pointStyle: 'circle', // 포인트 모양
+                borderColor: 'rgba(75, 192, 192, 1)', // 선의 색상
+                tension: 0.1 // 선의 곡률을 부드럽게
+            }]
+        },
+        options: {
+            responsive: true, // 반응형
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 14
                         }
                     }
-                });
+                }
+            },
+            scales: {
+                x: {
+                    type: 'category',
+                    title: {
+                        display: true,
+                        text: 'Day',
+                        font: {
+                            size: 14
+                        }
+                    }
+                },
+                y: {
+                    beginAtZero: false,
+                    title: {
+                        display: true,
+                        text: 'Price (₩)',
+                        font: {
+                            size: 14
+                        }
+                    }
+                }
             }
+            
+        }
+    });
+}
 
-            renderChart();
+renderChart();
 
         </script>
         <div class="buy_container">
@@ -153,7 +185,9 @@
                 </form>
             </div>
         </div>
-        <div class="poster">poster</div>
+        <br>
+        <div><img src="/static/images/posters/semicolon.png" alt="poster" class="poster"></div>
+        
     </div>
     {% include "navbar/bottomnav.html" %}  
 </body>

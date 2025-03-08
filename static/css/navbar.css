@@ -62,14 +62,16 @@
         border-radius: 10px 10px 0 0;
         z-index: 1000;
     }
-    .logo{
-        width: 50px;  
+    .logo {
+        width: 60px;  
         height: 60px;
-        margin: 0px 20px;
-        background-image: url("/static/images/semicolon logo.png"); 
+        margin: 0; /* 여백 제거 */
         background-size: contain;  /* 로고 이미지 크기 조절 */
         background-repeat: no-repeat;
         background-position: center;
+        display: inline-flex;
+        justify-content: flex-start;
+        margin-left: 0; /* 왼쪽 여백 0으로 설정 */
     }
     .ranking_icon{
         width: 50px;  
@@ -178,14 +180,16 @@
     }
     
     .logo{
-        width: 50px;  
+        width: 60px;  
         height: 60px;
-        margin: 0px 20px;
-        background-image: url("/static/images/semicolon logo.png"); 
+        margin: 0 auto;
         background-size: contain;  /* 로고 이미지 크기 조절 */
         background-repeat: no-repeat;
         background-position: center;
+        display: inline-flex;
+        justify-content: flex-start;
     }
+    
     .ranking_icon{
         width: 50px;  
         height: 50px;
@@ -234,15 +238,6 @@
         font-size: 12px;
         margin-right: 40px;
     }
-    .logout-icon{
-        width: 20px;  
-        height: 20px;
-        margin: 0px 20px;
-        display: inline-block;
-    }
-    .logout_-text{
-        display: none;
 
-    }
 }
     

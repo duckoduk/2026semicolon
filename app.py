@@ -43,7 +43,7 @@ def convert_to_serializable(obj):
 def profit_rate(currentPrice, averagePrice): #my_page용 (main_stock.html아님 주의)
     if averagePrice == 0:
         return "0.00%"  # 평균 구매가가 없을 경우 수익률 0% 반환
-    return f"{((currentPrice - averagePrice) / averagePrice) * 100:.2f}%"
+    return round(((currentPrice - averagePrice) / averagePrice) * 100,2)
 
 def update_stock_prices():
     global profit_value
@@ -358,21 +358,24 @@ def buy_stock(club):
     clubs=['세미콜론','실험의숲','그레이스','뉴턴','다독다독','데이터무제한','디세뇨','디아리오','메시스트','빌리네어','소솜','심쿵','아리솔','에스쿱','에어로테크','엘리제','온에어','티아','파라미터','피지카스트로','하람','늘품','세븐일레븐','매드매쓰','도담','데카르트','수학에복종','아페토','메이키스','폴리머','라온제나','리사','아스클레오피스','수북수북','아이티아이','럭스','쿠데타','헥사곤','개벽','혜윰']
     # 최근 데이터를 timestamp를 기준으로 내림차순 정렬하여 첫 번째 row만 가져옵니다.
     response = supabase.table('stock_data') \
-        .select("*") \
+        .select(club) \
         .order("timestamp", desc=True) \
-        .limit(1) \
+        .limit(2) \
         .execute()
 
     # Supabase API 응답은 response.data에 row 리스트로 들어있습니다.
     recent_row = response.data[0] if response.data else None
-
+    older_row = response.data[1] if response.data else None
+    
     if recent_row:
         # club 변수와 같은 이름의 컬럼 값을 가져옵니다.
         stock_value = recent_row.get(club)
+        profit_value = profit_rate(recent_row.get(club), older_row.get(club)) if older_row else "0.00%"
+
     else:
         stock_value = None
 
-    return render_template('buy_stock.html', clubs=clubs, club = club, description=description,stock_value=stock_value, balance=balance.data[0]['balance'], longer = longer)
+    return render_template('buy_stock.html', clubs=clubs, club = club, description=description,stock_value=stock_value, balance=balance.data[0]['balance'], longer = longer, profit_value=profit_value)
 
 
 @app.route('/stock') #전체 주식 보기 페이지
@@ -381,34 +384,20 @@ def my_page():
 
     club_price_DB= supabase.table('stock_data').select('*').order('id', desc=True).limit(1).execute()
     club_price = list(club_price_DB.data[0].values()) if club_price_DB.data else []
+    response = supabase.table('stock_data') \
+        .select("*") \
+        .order("timestamp", desc=True) \
+        .limit(2) \
+        .execute()
+    recent_row = response.data[0] if response.data else None
+    older_row = response.data[1] if response.data else None
+    profit_value = [profit_rate(recent_row.get(club), older_row.get(club)) if older_row else 0.00 for club in clubs]
+    color = ['red' if profit_value[i] > 0 else 'blue' for i in range(len(profit_value))]
+
+
     
-    return render_template('main_stock.html', username=session['username'], clubs=clubs, club_price=club_price)
+    return render_template('main_stock.html', username=session['username'], clubs=clubs, club_price=club_price, profit_value=profit_value,color=color)
 
-@app.route('/extra_buy', methods=['POST'])
-def extra_buy():
-    data = request.get_json()
-    quantity = data.get('quantity')
-    stock = data.get('stock')
-    existing=supabase.table('user_data').select(stock).eq("user_id", session['user_id']).execute()
-    existing_var= list(existing.data[0].values()) if existing.data else []
-    new= int(existing_var[0])+int(quantity)
-    supabase.table("user_data").update({stock: new}).eq("user_id", session['user_id']).execute()
-
-    #JSON 응답 반환 (클라이언트 새로고침 수행 명령!)
-    return jsonify({"message": f"매수 완료! 수량: {quantity}, 주식: {stock}"}), 200
-
-@app.route('/sell', methods=['POST'])
-def sell():
-    data = request.get_json()
-    quantity = data.get('quantity')
-    stock = data.get('stock')
-    existing=supabase.table('user_data').select(stock).eq("user_id", session['user_id']).execute()
-    existing_var= list(existing.data[0].values()) if existing.data else []
-    new= int(existing_var[0])-int(quantity)
-    supabase.table("user_data").update({stock: new}).eq("user_id", session['user_id']).execute()
-
-    #JSON 응답 반환 (클라이언트 새로고침 수행 명령!)
-    return jsonify({"message": f"매도 완료! 수량: {quantity}, 주식: {stock}"}), 200
 
 # 랭킹
 @app.route('/ranking') 

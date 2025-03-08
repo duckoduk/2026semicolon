@@ -14,14 +14,22 @@
         {% for i in range(clubs | length) %}
         <section class="stock-card">
             <div class="stock-info">
-                <div class="club_logo"></div>
+                <img class="club_logo" src="/static/images/logos/semicolon.png" alt="logo">
                 <div class="text-container">
                     <p class="club-name">{{ clubs[i] }}</p>
                     <p class="price">{{ club_price[i+2] }}₩</p>
                     <button class="buy_bt" onclick="location.href='{{ url_for('buy_stock', club=clubs[i]) }}';">Buy</button>
                 </div>
             </div>
-            <div class="chart"></div>
+            
+            <div class="profit_rate" style="display: flex; justify-content: center; align-items: center; margin: auto;">
+                {% if color[i] == 'red' %}
+                    <p style="color: red;">{{profit_value[i]}}%</p>
+                {% else %}
+                    <p style="color: blue;">{{profit_value[i]}}%</p>
+                {% endif %}
+            </div>
+
         </section>
         {% endfor %}
     </div>
