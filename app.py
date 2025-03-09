@@ -137,10 +137,13 @@ def dashboard():
         total_assets = supabase.table('user_data').select('total_assets').eq('user_id', session['user_id']).execute() #user_data 테이블의 total_assets 열 중 user_id가 session['user_id']인 행을 가져옴
         stock_data = supabase.table('user_data').select('*').eq('user_id', session['user_id']).execute()
         stock_price_data = supabase.table('stock_data').select('*').order('id', desc=True).limit(1).execute()
-        stock = list(stock_data.data[0].keys() if stock_data.data else [])[4:38]
-        stock_num = list(stock_data.data[0].values() if stock_data.data else [])[4:38]
+        stock = list(stock_data.data[0].keys() if stock_data.data else [])[4:37]
+        stock += list(stock_data.data[0].keys() if stock_data.data else [])[70:76]
+        stock_num = list(stock_data.data[0].values() if stock_data.data else [])[4:37]
+        stock_num += list(stock_data.data[0].values() if stock_data.data else [])[70:76]
         stock_price=list(stock_price_data.data[0].values() if stock_price_data.data else [])[2:]
-        average_price = list(stock_data.data[0].values() if stock_data.data else [])[38:]
+        average_price = list(stock_data.data[0].values() if stock_data.data else [])[37:70]
+        average_price += list(stock_data.data[0].values() if stock_data.data else [])[76:]
         profit_value = [profit_rate(stock_price[i], average_price[i]) for i in range(len(stock_price))]  # 수익률 계산
         # Supabase에서 해당 사용자의 pfp 값 가져오기
         response = supabase_client.table("users").select("pfp").eq("username", session['username']).execute()
@@ -204,17 +207,19 @@ def home():
     total_assets = supabase.table('user_data').select('total_assets').eq('user_id', session['user_id']).execute() #user_data 테이블의 total_assets 열 중 user_id가 session['user_id']인 행을 가져옴
     stock_data = supabase.table('user_data').select('*').eq('user_id', session['user_id']).execute()
     stock_price_data = supabase.table('stock_data').select('*').order('id', desc=True).limit(1).execute()
-    stock = list(stock_data.data[0].keys() if stock_data.data else [])[4:38]
-    stock_num = list(stock_data.data[0].values() if stock_data.data else [])[4:38]
+    stock = list(stock_data.data[0].keys() if stock_data.data else [])[4:37]
+    stock += list(stock_data.data[0].keys() if stock_data.data else [])[70:76]
+    stock_num = list(stock_data.data[0].values() if stock_data.data else [])[4:37]
+    stock_num += list(stock_data.data[0].values() if stock_data.data else [])[70:76]
     stock_price=list(stock_price_data.data[0].values() if stock_price_data.data else [])[2:]
-    average_price = list(stock_data.data[0].values() if stock_data.data else [])[38:]
+    average_price = list(stock_data.data[0].values() if stock_data.data else [])[37:70]
+    average_price += list(stock_data.data[0].values() if stock_data.data else [])[76:]
     profit_value = [profit_rate(stock_price[i], average_price[i]) for i in range(len(stock_price))]  # 수익률 계산
     # Supabase에서 해당 사용자의 pfp 값 가져오기
     response = supabase_client.table("users").select("pfp").eq("username", session['username']).execute()
     # `data`가 존재하면 `pfp` 값 가져오기
     pfp = response.data[0]["pfp"] if response.data else "Profile.png"  # 기본 이미지 설정
-    clubs=['세미콜론','실험의숲','그레이스','뉴턴','다독다독','데이터무제한','디세뇨','디아리오','메시스트','빌리네어','소솜','심쿵','아리솔','에스쿱','에어로테크','엘리제','온에어','티아','파라미터','피지카스트로','하람','늘품','세븐일레븐','매드매쓰','도담','데카르트','수학에복종','아페토','메이키스','폴리머','라온제나','리사','아스클레피오스','페이지오','헥사곤', '테미스', '매시스트', '유클리드', '모의유엔','엡실론','무법지대','트리니티']
-    return render_template('my_page.html', username=session['username'] , balance=balance.data[0]['balance'], total_assets=total_assets.data[0]['total_assets'],clubs=clubs, stock= stock, stock_num=stock_num, stock_price=stock_price, pfp=pfp, profit_value=profit_value)
+    return render_template('my_page.html', username=session['username'] , balance=balance.data[0]['balance'], total_assets=total_assets.data[0]['total_assets'],clubs=stock, stock= stock, stock_num=stock_num, stock_price=stock_price, pfp=pfp, profit_value=profit_value)
 
 
 
@@ -351,7 +356,9 @@ def buy_stock(club):
     description = get_description_by_club(club)
     longer = get_longer_by_club(club)
     balance = supabase.table('user_data').select('balance').eq('user_id', session['user_id']).execute() #user_data 테이블의 balance 열 중 user_id가 session['user_id']인 행을 가져옴
-    clubs=['세미콜론','실험의숲','그레이스','뉴턴','다독다독','데이터무제한','디세뇨','디아리오','메시스트','빌리네어','소솜','심쿵','아리솔','에스쿱','에어로테크','엘리제','온에어','티아','파라미터','피지카스트로','하람','늘품','세븐일레븐','매드매쓰','도담','데카르트','수학에복종','아페토','메이키스','폴리머','라온제나','리사','아스클레피오스','페이지오','헥사곤', '테미스', '매시스트', '유클리드', '모의유엔','엡실론','무법지대','트리니티']
+    stock_data = supabase.table('user_data').select('*').limit(1).eq('user_id', session['user_id']).execute()
+    clubs = list(stock_data.data[0].keys() if stock_data.data else [])[4:37]
+    clubs += list(stock_data.data[0].keys() if stock_data.data else [])[70:76]
     # 최근 데이터를 timestamp를 기준으로 내림차순 정렬하여 첫 번째 row만 가져옵니다.
     response = supabase.table('stock_data') \
         .select(club) \
@@ -376,8 +383,9 @@ def buy_stock(club):
 
 @app.route('/stock') #전체 주식 보기 페이지
 def my_page():
-    clubs=['세미콜론','실험의숲','그레이스','뉴턴','다독다독','데이터무제한','디세뇨','디아리오','메시스트','빌리네어','소솜','심쿵','아리솔','에스쿱','에어로테크','엘리제','온에어','티아','파라미터','피지카스트로','하람','늘품','세븐일레븐','매드매쓰','도담','데카르트','수학에복종','아페토','메이키스','폴리머','라온제나','리사','아스클레피오스','페이지오','헥사곤', '테미스', '매시스트', '유클리드', '모의유엔','엡실론','무법지대','트리니티']
-
+    stock_data = supabase.table('user_data').select('*').limit(1).eq('user_id', session['user_id']).execute()
+    clubs = list(stock_data.data[0].keys() if stock_data.data else [])[4:37]
+    clubs += list(stock_data.data[0].keys() if stock_data.data else [])[70:76]
     club_price_DB= supabase.table('stock_data').select('*').order('id', desc=True).limit(1).execute()
     club_price = list(club_price_DB.data[0].values()) if club_price_DB.data else []
     response = supabase.table('stock_data') \
