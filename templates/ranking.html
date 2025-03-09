@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/css/ranking.css">
+    <title>ranking</title>
+</head>
+<body>
+    {% include "navbar/topnav.html" %} <br><br><br><br>
+    <div class="container">
+        <div class="ranking">
+            <h1>Ranking</h1>
+            <table>
+                <tr>
+                    <th>Rank</th>
+                    <th>Profile</th>
+                    <th>Username</th>
+                    <th>Total Assets</th>
+                </tr>
+                {% for i in ranking %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <img src="{{ i.pfp if i.pfp else url_for('static', filename='images/pfp/세미콜론로고.jpg') }}" 
+                     alt="{{ i.pfp_filename }}" 
+                     class="ranking-pfp">
+                        </td>
+                        <td>{{ i.username }}</td>
+                        <td>{{ "{:,.2f}".format(i.total_assets) }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    {% include "navbar/bottomnav.html" %}  
+
+</body>
+</html>

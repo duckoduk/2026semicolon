@@ -1,0 +1,192 @@
+body{
+    margin: 5%;
+    font-family: Arial, sans-serif;
+    justify-self: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #F7F7F7;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+body::-webkit-scrollbar {
+    display: none;
+}
+
+input[type="number"], input[type="password"]{
+    background-color: #EFF7FF;
+    border: #EFF7FF;
+    border-radius: 10px;
+    color: #8BB6F5;
+    font-size: 15px;
+    width: 85%;
+    padding: 20px
+}
+
+input[type='number']:focus,
+    input[type='text']:focus,
+    input[type="password"]:focus{
+        border: #0089ED;
+        box-shadow: 0 0 10px rgba(0, 137, 237, 0.2);
+        outline: none;
+    }
+
+@media screen and (max-width: 800px) {
+    .header{
+        display: block;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .logo {
+        width: 70px;
+        height: 70px;
+        margin: 20px auto; /* 수직 여백과 중앙 정렬 */
+        background-image: url('/static/images/semicolon logo.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+    .box{
+        padding: 40px 20px;
+        border: 1px solid #878787;
+        border-radius: 10px;
+        background-color: #FFFFFF;
+    }
+    input[type="text"], input[type="password"]{
+        background-color: #EFF7FF;
+        border: #EFF7FF;
+        border-radius: 10px;
+        color: #8BB6F5;
+        font-size: 15px;
+        width: 85%;
+        padding: 20px
+    }
+    input[type="number"], input[type="password"]{
+        background-color: #EFF7FF;
+        border: #EFF7FF;
+        border-radius: 10px;
+        color: #8BB6F5;
+        font-size: 15px;
+        width: 85%;
+        padding: 20px
+    }
+    input[type='number']:focus,
+    input[type='text']:focus,
+    input[type="password"]:focus{
+        border: #0089ED;
+        box-shadow: 0 0 10px rgba(0, 137, 237, 0.2);
+        outline: none;
+    }
+    input[type='text']::placeholder,
+    input[type='password']::placeholder{
+        color:#8BB6F5;
+    }
+    input[type="submit"] {
+        width: 100%;
+        padding: 20px 50px;
+        background-color: #0089ED;
+        color: #EFF7FF;
+        border: none;
+        border-radius: 10px;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+        box-shadow: rgba(0, 104, 180, 0.4) 0px 7px 29px 0px;
+        cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+        background-color: #005FA3;
+        transform: scale(1.05);
+    }
+
+    .text-bt {
+        background-color: transparent;
+        border: none;
+        color: #0089ED;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .text-bt:hover {
+        color: #005FA3;
+    }
+    label span{
+        font-size: 10px; /* 글자 크기 변경 */
+        color: #333; /* 텍스트 색상 */
+    }
+}
+
+@media screen and (min-width: 801px) {
+    .box {
+        padding: 40px 100px;
+        border: 1px solid #878787;
+        border-radius: 10px;
+        background-color: #FFFFFF;
+    }
+    .header{
+        display: flex;
+        align-items: center; /* 세로 중앙 정렬 */
+        gap: 20%; /* 로고와 텍스트 사이 간격 */
+    }
+    .logo {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        background-image: url('/static/images/semicolon logo.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    input[type="text"], 
+    input[type="password"] {
+        background-color: #EFF7FF;
+        border: 1px solid #EFF7FF;
+        border-radius: 10px;
+        color: #8BB6F5;
+        font-size: 15px;
+        width: 91%;
+        padding: 20px;
+        transition: border 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    input[type="text"]:focus, 
+    input[type="password"]:focus {
+        border: 1px solid #0089ED;
+        box-shadow: 0 0 10px rgba(0, 137, 237, 0.2);
+        outline: none;
+    }
+
+    input[type="submit"] {
+        width: 100%;
+        padding: 20px 50px;
+        background-color: #0089ED;
+        color: #EFF7FF;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+        box-shadow: rgba(0, 104, 180, 0.4) 0px 7px 29px 0px;
+    }
+
+    input[type="submit"]:hover {
+        background-color: #005FA3;
+        transform: scale(1.05);
+    }
+
+    .text-bt {
+        background-color: transparent;
+        border: none;
+        color: #0089ED;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .text-bt:hover {
+        color: #005FA3;
+    }
+}

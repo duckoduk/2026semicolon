@@ -1,0 +1,306 @@
+body{
+    background-color: #EAEAEA;
+    justify-content: center;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+body::-webkit-scrollbar {
+    display: none;
+}
+@media screen and (max-width:800px){
+    
+    section {
+        display: flex;            
+        align-items: center;      /* 세로 가운데 정렬 */
+        justify-content: flex-start;  /* 왼쪽 정렬 */
+        border-radius: 10px;
+        background-color: white;
+        padding: 5%;
+        width: 90%; /* 원하는 크기로 조정 */
+        height: auto;
+        box-shadow:  rgba(0, 0, 0, 0.25) 0px -7px 29px 0px;
+        flex-wrap: wrap; /*반응형*/
+    }
+
+        /* 전체 컨테이너 정렬 */
+    #stock-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center; /* 카드들을 가로 중앙 정렬 */
+        gap: 20px; /* 카드 사이 간격 */
+        padding: 20px;
+    }
+
+    /* 개별 카드 스타일 */
+    .stock-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between; /* 양 끝 정렬 */
+        width: 100%;
+        max-width: 500px;
+        height: 120px;
+        padding: 15px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        margin: 10px auto;
+    }
+
+    /* 로고, 텍스트, 버튼을 정렬 */
+    .stock-info {
+        display: flex;
+        align-items: center;
+        flex-grow: 1; /* 오른쪽 차트 밀어내기 */
+        gap: 12px;    /* 로고와 텍스트 간격 */
+    }
+
+    /* 클럽 로고 */
+    .club_logo {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        flex-shrink: 0; /* 크기 유지 */
+    }
+
+
+    /* 클럽 이름 & 가격 */
+    .text-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .club-name {
+        font-size: 18px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .price {
+        font-size: 14px;
+        color: #555;
+        margin: 5px 0;
+    }
+
+    /* 버튼 */
+    .buy_bt {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 6px 12px;
+        font-size: 14px;
+        cursor: pointer;
+        width: 70px; /* 버튼 크기 고정 */
+    }
+
+    /* 차트 */
+    .chart {
+        width: 90px;
+        height: 90px;
+        background-color: #e0e0e0;
+        border-radius: 8px;
+        flex-shrink: 0;      /* 차트 크기 유지 */
+        margin-left: 15px;   /* 왼쪽 정보와 간격 */
+    }
+
+
+    }
+
+
+
+@media screen and (min-width:801px){
+
+    /*프로필 사진 컨테이너 (이미지 & 편집 버튼 포함) */
+.profile-image-container {
+    position: relative;
+    display: inline-block;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+/*기본 프로필 이미지 스타일 */
+.profile_image {
+    width: 100px; /* 원하는 크기 */
+    height: 100px;
+    border-radius: 50%;
+    transition: filter 0.3s ease; /* 어두워지는 효과 */
+}
+
+/*마우스를 올리면 프로필 사진이 살짝 어두워짐 */
+.profile-image-container:hover .profile_image {
+    filter: brightness(0.5);
+}
+
+/*연필 아이콘 스타일 */
+.edit-icon {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    background-color: rgba(0, 0, 0, 0.7); /* 반투명 검은색 */
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    opacity: 0; /* 기본적으로 안 보이게 설정 */
+}
+
+/*마우스를 올리면 연필 아이콘이 나타남 */
+.profile-image-container:hover .edit-icon {
+    opacity: 1;
+}
+
+
+section {
+    display: flex;            
+    align-items: center;       /* 세로 중앙 정렬 */
+    justify-content: center;   /* 가로 중앙 정렬 */
+    border-radius: 10px;
+    background-color: white;
+    padding: 5%;
+    width: 90%;               /* 너비 조정 */
+    height: auto;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px -7px 29px 0px;
+    flex-wrap: wrap; /* 반응형 */
+    
+    /* 💡 핵심 코드: 가로 중앙 정렬 */
+    margin: 0 auto;
+}
+
+
+
+.contents {
+    display: flex;
+    flex-direction: column;  /* 세로 정렬 */
+    align-items: center;     /* 가로 중앙 정렬 */
+    justify-content: center; /* 세로 중앙 정렬 */
+    width: 70%;             /* 전체 너비 사용 */
+    padding: 20px;
+}
+
+
+
+/*카드 컨테이너 (4개씩 배치) */
+#stock-container {
+display: grid;
+grid-template-columns: repeat(4, 1fr); /* 4개씩 배치 */
+gap: 30px; /* 카드 사이 간격 */
+
+/* 가운데 정렬 핵심 */
+justify-content: center;  /* 가로 정렬 */
+align-items: center;      /* 세로 정렬 */
+width: 90%;               /* 화면 너비 조정 */
+margin: 0 auto;           /* 가로 중앙 정렬 */
+padding: 40px;
+}
+
+/*개별 카드 스타일 */
+.stock-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 90%;
+    max-width: 500px;
+    height: 120px;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease-in-out;
+    margin: 1px auto;
+    }
+
+/*카드 hover 효과 */
+.stock-card:hover {
+transform: translateY(-5px);
+}
+
+/*로고 & 텍스트 정렬 */
+.stock-info {
+display: flex;
+align-items: center;
+gap: 15px;
+}
+
+/*클럽 로고 */
+.club_logo {
+width: 80px;
+height: 80px;
+background-image: url("/static/images/semicolon logo.png");
+background-size: contain;
+background-repeat: no-repeat;
+background-position: center;
+}
+
+/*클럽 이름 & 가격 */
+.text-container {
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+}
+
+.club-name {
+font-size: 19px;
+font-weight: bold;
+margin-bottom: -10px;
+}
+
+.price {
+font-size: 18px;
+color: #444;
+margin-bottom: 8px; /* 불필요한 여백 제거 */
+}
+
+/*구매 버튼 */
+.buy_bt {
+background-color: #0089ED;
+color: white;
+border: none;
+border-radius: 6px;
+padding: 8px 18px;
+font-size: 16px;
+cursor: pointer;
+margin-top: 4px;
+transition: 0.2s;
+}
+
+.buy_bt:hover {
+background-color: #0067c0;
+}
+
+/*차트 크기 조정 */
+.chart {
+width: 120px;
+height: 80px;
+background: lightgray;
+border-radius: 6px;
+}
+
+/*반응형 (태블릿) → 2개씩 배치 */
+@media (max-width: 1400px) {
+#stock-container {
+    grid-template-columns: repeat(2, 1fr);
+}
+}
+
+/*반응형 (모바일) → 1개씩 배치 */
+@media (max-width: 768px) {
+#stock-container {
+    grid-template-columns: repeat(1, 1fr);
+}
+.stock-card {
+    width: 90%;
+}
+}
+}

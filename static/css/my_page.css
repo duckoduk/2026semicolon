@@ -1,0 +1,413 @@
+body{
+    background-color: #EAEAEA;
+    padding-bottom: 70px; /* 네비게이션 바와 겹치는 문제 해결 */
+    padding-top: 50px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+body::-webkit-scrollbar {
+    display: none;
+}
+
+.profile-image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.profile_image {
+    width: 150px;  /* 기본 크기 */
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.edit-icon {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+}
+
+/* 모달 스타일 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    text-align: center;
+}
+
+.image-options img {
+    width: 100px;
+    margin: 10px;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: transform 0.2s;
+}
+
+.image-options img:hover {
+    transform: scale(1.1);
+}
+
+.close {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+@media screen and (max-width:800px){
+
+    .club_logo {
+        width: 70px;
+        height: 70px;
+        background-image: url("/static/images/semicolon logo.png");
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        margin-right: 10px;
+    }
+    .club{
+        display: flex;
+        align-items: center;
+    }
+    .club_info{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex-grow: 1; /* 반응형 대응 */
+    }
+    .club_info p{
+        margin: 6px 0px;
+    }
+
+    .button_group {
+        display: flex;
+        margin-left: auto;
+        gap: 10px;
+    }
+    .buy_bt, .sell_bt {
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        width: 80px;
+        height: 35px;
+        text-align: center;
+        white-space: nowrap;
+    }
+    .buy_bt {
+        background-color: #0089ED;
+        color: white;
+        
+    }
+
+    .sell_bt {
+        background-color: #FF4D4D;
+        color: white;
+    }
+    .container{    
+        max-width: 800px;
+        width: 90%;
+        margin: 0 auto;
+        border: 1px solid #ccc;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+    }
+    section {
+        display: flex;            
+        align-items: center;      /* 세로 가운데 정렬 */
+        justify-content: space-between; /* 요소 간 간격 조정 */
+        border-radius: 10px;
+        background-color: white;
+        padding: 5%;
+        width: 90%; 
+        height: auto;
+        box-shadow:  rgba(0, 0, 0, 0.25) 0px -7px 29px 0px;
+        flex-wrap: wrap; /* 반응형 지원 */
+    }
+    .profile {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 5%;
+        width: 90%;
+        height: 180px;
+        margin: 10px auto;
+        background-color: white;
+        border-radius: 20px;
+        box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 12px;
+    }
+    .inform{
+        margin: 10%;
+    }
+    .profile_image{
+        width: 100px;  
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover; 
+        margin: 5px 20px;
+    }
+
+    input[type=number]{
+        width: 25%;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .profile_image {
+        width: 100px;
+        height: 100px;
+    }
+
+    .edit-icon {
+        width: 30px;
+        height: 30px;
+        bottom: 5px;
+        right: 5px;
+    }
+
+    /* 모달 크기 조정 */
+    .modal-content {
+        width: 90%;  /* 화면 크기에 맞게 조절 */
+        padding: 15px;
+    }
+
+    /* 선택 가능한 이미지 크기 조정 */
+    .image-options img {
+        width: 80px;
+    }
+
+    /* 닫기 버튼 크기 조정 */
+    .close {
+        font-size: 20px;
+    }
+}
+
+@media screen and (min-width:801px){
+    
+    .club_logo {
+        width: 70px;
+        height: 70px;
+        background-image: url("/static/images/semicolon logo.png");
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        margin-right: 10px;
+    }
+    .club{
+        display: flex;
+        align-items: center;
+    }
+    .club_info{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex-grow: 1; /* 반응형 대응 */
+    }
+    .club_info p{
+        margin: 6px 0px;
+    }
+
+    .button_group {
+        display: flex;
+        margin-left: auto;
+        gap: 10px;
+    }
+    .buy_bt, .sell_bt {
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        width: 80px;
+        height: 35px;
+        text-align: center;
+        white-space: nowrap;
+    }
+    .buy_bt {
+        background-color: #0089ED;
+        color: white;
+        
+    }
+
+    .sell_bt {
+        background-color: #FF4D4D;
+        color: white;
+    }
+    .container{    
+        max-width: 800px;
+        width: 90%;
+        margin: 0 auto;
+        border: 1px solid #ccc;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+    }
+    section {
+        display: flex;            
+        align-items: center;      /* 세로 가운데 정렬 */
+        justify-content: space-between; /* 요소 간 간격 조정 */
+        border-radius: 10px;
+        background-color: white;
+        padding: 5%;
+        width: 90%; 
+        height: auto;
+        box-shadow:  rgba(0, 0, 0, 0.25) 0px -7px 29px 0px;
+        flex-wrap: wrap; /* 반응형 지원 */
+    }
+    .profile {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 5%;
+        width: 90%;
+        height: 180px;
+        margin: 10px auto;
+        background-color: white;
+        border-radius: 20px;
+        box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 12px;
+    }
+    .inform{
+        margin: 10%;
+    }
+    .profile_image{
+        width: 200px;  
+        height: 200px;
+        border-radius: 50%;
+        object-fit: cover; 
+        margin: 5px 20px;
+    }
+
+    input[type=number]{
+        width: 25%;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .profile-image-container {
+        position: relative;
+        display: inline-block;
+    }
+    
+    /*기본 프로필 이미지 */
+    .profile_image {
+        width: 200px;  /* 원하는 크기 */
+        height: 200px;
+        border-radius: 50%; /* 원형 유지 */
+    }
+
+    /*연필 아이콘 (프로필 사진과 같은 크기로 겹치기) */
+    .edit-icon {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 200px;  /* 프로필 사진과 동일한 크기 */
+        height: 200px;
+        border-radius: 50%;
+        opacity: 0; /* 기본적으로 숨김 */
+        transition: opacity 0.3s ease;
+    }
+
+    /*마우스를 올리면 연필 아이콘이 나타남 */
+    .profile-image-container:hover .edit-icon {
+        opacity: 1;
+    }
+
+    /*마우스를 올리면 프로필 사진이 살짝 어두워짐 */
+    .profile-image-container:hover .profile_image {
+        filter: brightness(0.6);
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        overflow: hidden; /* 배경 스크롤 방지 */
+    }
+    
+    .modal-content {
+        background-color: white;
+        margin: 10% auto;
+        padding: 20px;
+        border-radius: 10px;
+        width: 250px;
+        text-align: center;
+        max-height: 80vh; /* 모달 창 높이 제한 */
+        overflow-y: auto; /* 세로 스크롤 가능하도록 설정 */
+    }
+    
+    .image-options {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* 두 개씩 배치 */
+        gap: 10px;
+        justify-items: center;
+    }
+    
+    .selectable-image {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+        cursor: pointer;
+        border-radius: 8px;
+        margin: 5px;
+    }
+
+    .image-options img:hover {
+        transform: scale(1.1);
+    }
+
+    .close {
+        float: right;
+        font-size: 24px;
+        cursor: pointer;
+    }
+
+    /* 수량 입력란 */
+    .quantity-input {
+        width: 80px; /* 적당한 가로 크기 */
+        height: 38px; /* 클릭 및 터치 시 편안한 높이 */
+        padding: 0 10px; /* 내부 여백 */
+        font-size: 16px; /* 가독성 높은 글씨 크기 */
+        border: 1px solid #ccc; /* 부드러운 테두리 */
+        border-radius: 8px; /* 둥근 모서리 */
+        outline: none; /* 기본 포커스 제거 */
+        transition: border-color 0.3s ease, box-shadow 0.3s ease; /* 부드러운 전환 효과 */
+    }
+
+    /* 입력란 포커스 시 스타일 */
+    .quantity-input:focus {
+        border-color: #007bff; /* 파란색 강조 */
+        box-shadow: 0 0 8px rgba(0, 123, 255, 0.4); /* 포커스 시 부드러운 그림자 */
+    }
+
+    /* 입력란에 화살표 제거 (크롬, 사파리 등 웹킷 기반 브라우저) */
+    .quantity-input::-webkit-outer-spin-button,
+    .quantity-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* 파이어폭스 화살표 제거 */
+    .quantity-input[type=number] {
+        -moz-appearance: textfield;
+    }
+}

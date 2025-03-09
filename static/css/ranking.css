@@ -1,0 +1,75 @@
+body{
+    
+    background-color: #EAEAEA;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    overflow-x: hidden; /* 가로 스크롤 방지 */
+}
+body::-webkit-scrollbar {
+    display: none;
+}
+
+.container {
+    max-width: 800px;
+    width: 90%;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 12px; /* 부드러운 그림자 */
+}
+table {
+    width: 100%;
+    border-collapse: collapse; /* 테이블 경계선 겹침 방지 */
+    border-radius: 12px; /* 전체 테이블 모서리 둥글게 */
+    overflow: hidden; /* 모서리 둥근 효과 유지 */
+
+}
+
+th, td {
+    padding: 12px; /* 상하 간격 추가 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+}
+
+th {
+    background-color: #f4f4f4; /* 헤더 배경 색 */
+    border-bottom: 2px solid #ccc; /* 헤더 아래 가로선 */
+}
+
+tr {
+    border-bottom: 1px solid #ddd; /* 각 행 하단에 가로선 추가 */
+}
+
+tr:last-child {
+    border-bottom: none; /* 마지막 행에는 가로선 제거 */
+}
+
+tbody tr:hover {
+    background-color: #f9f9f9; /* 마우스 호버 시 강조 효과 */
+}
+
+.ranking-pfp {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+@media screen and (max-width:800px){
+    section {
+        display: flex;            
+        align-items: center;      /* 세로 가운데 정렬 */
+        justify-content: flex-start;  /* 왼쪽 정렬 */
+        border-radius: 10px;
+        background-color: white;
+        padding: 5%;
+        width: 90%; /* 원하는 크기로 조정 */
+        margin : 0px;
+        height: auto;
+        box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 12px;
+        flex-wrap: wrap; /*반응형*/
+    }   
+}

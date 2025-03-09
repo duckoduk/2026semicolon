@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/css/my_page.css">
+    <title>my_page</title>
+</head>
+<body>
+
+<div id="stockData" data-stocks='{{ stock | tojson | safe }}'></div>
+<script>
+    function calculate(event) {
+        const form = event.target.closest("form");  // 현재 입력 필드가 속한 form 찾기
+        if (!form) return;
+
+        const stockValueElement = form.closest(".contents").querySelector("#stock_value"); 
+        const stockValue = parseFloat(stockValueElement.textContent.trim()); 
+        const amount = parseFloat(event.target.value);
+
+        const resultDisplay = form.querySelector(".result"); // resultDisplay 찾기
+
+        console.log("stockValue:", stockValue)
+        console.log("amount:", amount)
+        console.log("result:",resultDisplay)
+
+        if (!isNaN(stockValue) && !isNaN(amount)) {    
+            resultDisplay.textContent = (stockValue * amount).toLocaleString();
+        } else {
+            resultDisplay.textContent = "올바른 숫자를 입력하세요!";
+        }
+    }
+    document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".buy_bt, .sell_bt").forEach(button => {
+        button.addEventListener("click", function (event) {
+            event.preventDefault();  // 기본 폼 제출 방지
+
+            const form = event.target.closest("form");
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: form.method,
+                body: formData
+            })
+            .then(response => response.json()) // JSON 형태로 응답을 받음
+            .then(data => {
+                if (data.message) {
+                    alert(data.message); // Flask에서 보낸 메시지를 alert으로 출력
+                } else {
+                    alert("서버 응답 형식 오류!");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("요청 처리 중 오류가 발생했습니다.");
+            });
+        });
+    });
+});
+
+
+
+</script>
+
+{% include "navbar/topnav.html" %}
+
+<div class="container">
+    <div class="profile">
+        <div class="profile-image-container">
+            <!-- Flask에서 받은 pfp 값으로 초기 프로필 이미지 설정 -->
+            <img class="profile_image" src="/static/images/pfp/{{ pfp }}" alt="profile_image">
+            <img class="edit-icon" src="/static/images/edit_icon.png" alt="edit_icon">
+        </div>
+    
+        <!-- 프로필 사진 선택 모달 -->
+        <div id="imageSelectionModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>프로필 사진 선택</h3>
+                <div class="image-options">
+                    {% for i in range(clubs | length) %}
+                        <img class="selectable-image" 
+                        src="{{ url_for('static', filename='images/logos/{}로고.jpg'.format(clubs[i])) }}" 
+                        alt="{{ clubs[i] }}">
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    
+        <script>
+            // Flask에서 전달받은 데이터
+            const username = "{{ username }}";  // 사용자명
+            const pfp = "{{ pfp }}";  // DB에서 가져온 프로필 이미지 파일명
+    
+            // 페이지 로드 시 저장된 pfp 값이 있으면 프로필 이미지 업데이트
+            window.onload = function() {
+                console.log("Loaded profile picture:", pfp);
+                if (pfp) {
+                    document.querySelector(".profile_image").src = `/static/images/pfp/${pfp}`;
+                }
+            };
+    
+            async function updateProfilePicture(pfpFilename) {
+                try {
+                    const response = await fetch("/update_pfp", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            username: username,  // Flask에서 받은 username 사용
+                            pfp: pfpFilename
+                        })
+                    });
+    
+                    const result = await response.json();
+                    if (response.ok) {
+                        console.log("Profile picture updated:", result);
+                    } else {
+                        console.error("Error updating profile picture:", result);
+                    }
+                } catch (error) {
+                    console.error("Request failed:", error);
+                }
+            }
+    
+            document.addEventListener("DOMContentLoaded", function() {
+                const editIcon = document.querySelector(".edit-icon");
+                const modal = document.getElementById("imageSelectionModal");
+                const closeModal = document.querySelector(".close");
+    
+                if (editIcon && modal && closeModal) {
+                    // 편집 아이콘 클릭 시 모달 열기
+                    editIcon.addEventListener("click", function() {
+                        console.log("모달 열기 클릭됨");
+                        modal.style.display = "block";
+                    });
+    
+                    // 닫기 버튼 클릭 시 모달 닫기
+                    closeModal.addEventListener("click", function() {
+                        console.log("모달 닫기 클릭됨");
+                        modal.style.display = "none";
+                    });
+    
+                    // 모달 바깥 영역 클릭 시 닫기
+                    window.addEventListener("click", function(event) {
+                        if (event.target === modal) {
+                            console.log("모달 바깥 클릭됨");
+                            modal.style.display = "none";
+                        }
+                    });
+                } else {
+                    console.error("모달 요소가 존재하지 않습니다.");
+                }
+    
+                // 이미지 선택 시 프로필 변경 및 Flask API 호출
+                document.querySelectorAll(".selectable-image").forEach(img => {
+                    img.addEventListener("click", function() {
+                        const pfpFilename = this.src.split("/").pop();  // 이미지 파일명만 추출
+                        document.querySelector(".profile_image").src = this.src;
+                        document.getElementById("imageSelectionModal").style.display = "none";
+    
+                        // Flask 백엔드 API 호출 (Supabase에 저장)
+                        updateProfilePicture(pfpFilename);
+                    });
+                });
+            });
+        </script>
+        <div class="inform">
+            <div class="profile-username"><h1>{{username}}</h1></div>
+            <div class="wallet">
+                <p>보유자금 : {{balance}}</p>
+                <p>총 자산 : {{total_assets}}</p>
+            </div>
+        </div>
+    </div>
+    <br>
+    <hr>
+    <br>
+
+    {% for i in range(stock|length) %}
+        {% if stock_num[i] != 0 %}
+            <div class="contents">
+                <section>
+                    <div style="display: flex;">
+                        <div class="club">
+                            <div class="club_logo"></div>
+                        </div>
+                        <div class="club_info">
+                            <div style="display: flex; gap: 20px; height: auto;"> 
+                                <p>{{stock[i]}}</p>  
+                            </div>
+                            <p>보유 수량 : {{stock_num[i]}} </p>
+                            <p >현재가격 : <span id="stock_value">{{stock_price[i]}}</span></p>
+                            <p>총 가치 : {{stock_price[i]*stock_num[i]}} </p>
+                            <p>수익률 : {{profit_value[i]}}</p> <!-- 나중에 SAMPLE 지울것! 일단 테스트용 -->
+                        </div>
+                    </div>
+                    <div class="inputs" style="display: flex; margin-top: 15px;">
+                        <div class="button_group"> 
+                            <div class="buy_container">
+                                <form id="buy_form" action="/buy_stock" method="post">
+                                    <input type="hidden" name="club" value="{{ stock[i] }}">
+                                    <input type="hidden" name="trade" value="buy">
+                                    <input type="number" name="amount" class="quantity-input" min="1" oninput="calculate(event)" placeholder="수량 입력">
+                                    <button type="submit" class="buy_bt">추가매수</button>
+                                    <p><strong>총액:</strong> <span class="result">0</span></p> <!-- 총액 표시 영역 -->
+                                </form>
+                                <form id="sell_form" action="/buy_stock" method="post">
+                                    <input type="hidden" name="club" value="{{ stock[i] }}">
+                                    <input type="hidden" name="trade" value="sell">
+                                    <input type="number" name="amount" class="quantity-input" min="1" oninput="calculate(event)" placeholder="수량 입력">
+                                    <button type="submit" class="sell_bt">매도</button>
+                                    <p><strong>총액:</strong> <span class="result">0</span></p>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <br>
+            {% endif%}
+        {% endfor %}
+    </div>
+    {% include "navbar/bottomnav.html" %}
+   
+</body>
+</html>
