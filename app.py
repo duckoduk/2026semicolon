@@ -86,7 +86,7 @@ def update_stock_prices():
 
 # 🕒 스케줄러 설정: 10초마다 실행
 scheduler = BackgroundScheduler()
-scheduler.add_job(update_stock_prices, "cron", hour='9-23', minute='*/10', second='30')#test
+scheduler.add_job(update_stock_prices, "cron", hour='8-23', minute='*/10', second='30')#test
 scheduler.start()
 
 
