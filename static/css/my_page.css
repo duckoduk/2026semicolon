@@ -380,4 +380,34 @@ body::-webkit-scrollbar {
         font-size: 24px;
         cursor: pointer;
     }
+
+    /* 수량 입력란 */
+    .quantity-input {
+        width: 80px; /* 적당한 가로 크기 */
+        height: 38px; /* 클릭 및 터치 시 편안한 높이 */
+        padding: 0 10px; /* 내부 여백 */
+        font-size: 16px; /* 가독성 높은 글씨 크기 */
+        border: 1px solid #ccc; /* 부드러운 테두리 */
+        border-radius: 8px; /* 둥근 모서리 */
+        outline: none; /* 기본 포커스 제거 */
+        transition: border-color 0.3s ease, box-shadow 0.3s ease; /* 부드러운 전환 효과 */
+    }
+
+    /* 입력란 포커스 시 스타일 */
+    .quantity-input:focus {
+        border-color: #007bff; /* 파란색 강조 */
+        box-shadow: 0 0 8px rgba(0, 123, 255, 0.4); /* 포커스 시 부드러운 그림자 */
+    }
+
+    /* 입력란에 화살표 제거 (크롬, 사파리 등 웹킷 기반 브라우저) */
+    .quantity-input::-webkit-outer-spin-button,
+    .quantity-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* 파이어폭스 화살표 제거 */
+    .quantity-input[type=number] {
+        -moz-appearance: textfield;
+    }
 }
