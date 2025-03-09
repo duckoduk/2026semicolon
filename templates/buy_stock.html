@@ -136,8 +136,9 @@ renderChart();
         <div class="buy_container">
             <div class="balance"><p>보유 자금: {{ "{:,}".format(balance|int) }}</p></div>
             <div class="purchase-section">
-                <form action="/buy_stock" method="post">
+                <form id="buy_form" action="/buy_stock" method="post">
                     <input type="hidden" name="club" value="{{ club }}">
+                    <input type="hidden" name="trade" value="buy">
                     <input type="number" id="amountInput" name="amount" class="quantity-input" min="1" oninput="calculate()" placeholder="수량 입력">
                     <button type="submit" class="buy_bt">구매</button>
                     <script>
