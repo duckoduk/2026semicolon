@@ -10,6 +10,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 from datetime import datetime
 import numpy as np
+import urllib.parse
 
 sigma = 0.7 #표준편차(변동성) 일단 2%
 price_limit=2000 #가격 변동 범위 -2000 ~ 2000
@@ -399,26 +400,42 @@ def ranking():
                        .select('user_id, total_assets') \
                        .order('total_assets', desc=True) \
                        .execute()
+    
     if not response.data:
         return render_template('ranking.html', username=session['username'], ranking=[])
-    
-    # Fetch usernames for each user_id
+
+    # Fetch usernames and profile pictures (pfp) for each user_id
     user_ids = [row['user_id'] for row in response.data]
+    
     users_response = supabase.table('users') \
-                             .select('student_id, username') \
+                             .select('student_id, username, pfp') \
                              .in_('student_id', user_ids) \
                              .execute()
-    users = {user['student_id']: user['username'] for user in users_response.data}
+    
+    # 사용자 정보 딕셔너리 생성 (디코딩 적용)
+    users = {
+        user['student_id']: {
+            'username': user['username'],
+            'pfp': urllib.parse.unquote(user['pfp']) if user['pfp'] else None  # 디코딩 적용
+        }
+        for user in users_response.data
+    }
 
+    # 랭킹 데이터 생성
     ranking = [
         {
-            'username': users[row['user_id']],
+            'username': users[row['user_id']]['username'],
+            'pfp': url_for('static', filename=f"images/pfp/{users[row['user_id']]['pfp']}") if users[row['user_id']]['pfp'] else None,
+            'pfp_filename': users[row['user_id']]['pfp'] if users[row['user_id']]['pfp'] else "세미콜론로고.png",  # 파일명 저장
             'total_assets': row['total_assets']
         }
-        for row in response.data
+        for row in response.data if row['user_id'] in users
     ]
 
     return render_template('ranking.html', username=session['username'], ranking=ranking)
+
+
+
 
 @app.route('/stock_data/<club>') # 그래프
 def stock_data(club):

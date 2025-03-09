@@ -14,13 +14,19 @@
             <table>
                 <tr>
                     <th>Rank</th>
+                    <th>Profile</th>
                     <th>Username</th>
                     <th>Total Assets</th>
                 </tr>
                 {% for i in ranking %}
                     <tr>
-                        <td>{{loop.index}}</td>
-                        <td>{{i.username}}</td>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <img src="{{ i.pfp if i.pfp else url_for('static', filename='images/pfp/세미콜론로고.png') }}" 
+                     alt="{{ i.pfp_filename }}" 
+                     class="ranking-pfp">
+                        </td>
+                        <td>{{ i.username }}</td>
                         <td>{{ "{:,.2f}".format(i.total_assets) }}</td>
                     </tr>
                 {% endfor %}
