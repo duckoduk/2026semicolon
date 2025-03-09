@@ -42,7 +42,7 @@ def convert_to_serializable(obj):
 
 def profit_rate(currentPrice, averagePrice): #my_page용 (main_stock.html아님 주의)
     if averagePrice == 0:
-        return "0.00%"  # 평균 구매가가 없을 경우 수익률 0% 반환
+        return 0.00  # 평균 구매가가 없을 경우 수익률 0% 반환
     return round(((currentPrice - averagePrice) / averagePrice) * 100,2)
 
 def update_stock_prices():
@@ -85,7 +85,8 @@ def update_stock_prices():
 
 # 🕒 스케줄러 설정: 10초마다 실행
 scheduler = BackgroundScheduler()
-scheduler.add_job(update_stock_prices, "cron", hour='20,21,22', minute='*/1', second='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59')#test
+scheduler.add_job(update_stock_prices, "interval", seconds=100000)
+#scheduler.add_job(update_stock_prices, "cron", hour='20,21,22', minute='*/1', second='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59')#test
 scheduler.start()
 
 
@@ -391,11 +392,23 @@ def my_page():
         .execute()
     recent_row = response.data[0] if response.data else None
     older_row = response.data[1] if response.data else None
-    profit_value = [profit_rate(recent_row.get(club), older_row.get(club)) if older_row else 0.00 for club in clubs]
+    print('recent_row')
+    print(recent_row)
+    print('older_row') 
+    print(older_row)
+    print(len(recent_row), len(older_row))
+    profit_value = [
+    profit_rate(
+        int(recent_row.get(club, 0) or 0), 
+        int(older_row.get(club, 0) or 0)
+    ) if older_row else 0.00 
+    for club in clubs
+]
+
+    print('profit_value')
+    print(profit_value)
     color = ['red' if profit_value[i] > 0 else 'blue' for i in range(len(profit_value))]
 
-
-    
     return render_template('main_stock.html', username=session['username'], clubs=clubs, club_price=club_price, profit_value=profit_value,color=color)
 
 
