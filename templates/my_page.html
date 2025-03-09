@@ -78,8 +78,11 @@
                 <span class="close">&times;</span>
                 <h3>프로필 사진 선택</h3>
                 <div class="image-options">
-                    <img class="selectable-image" src="/static/images/pfp/Duck.png" alt="Duck">
-                    <img class="selectable-image" src="/static/images/pfp/Unicorn.png" alt="Unicorn">
+                    {% for i in range(clubs | length) %}
+                        <img class="selectable-image" 
+                        src="{{ url_for('static', filename='images/logos/{}로고.jpg'.format(clubs[i])) }}" 
+                        alt="{{ clubs[i] }}">
+                    {% endfor %}
                 </div>
             </div>
         </div>
