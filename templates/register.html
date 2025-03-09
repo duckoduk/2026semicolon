@@ -17,8 +17,10 @@
         <div class="logo"></div>
     </div>
     <form action="/register_data" method="POST">
-            <input type="text" name ="ID" placeholder="학번 ex)10101" value="{{id}}" required><br><br>
-            <input type="text" name ="USERNAME" placeholder="아이디 ex) 롯데리아 케챱 도둑" value="{{username}}" required>
+            <input type="number" name="ID" id="ID" placeholder="학번 ex) 10101" value="{{ id }}" 
+            min="10100" max="31500" required><br><br>
+            <input type="text" name="USERNAME" id="USERNAME" placeholder="아이디 ex) 롯데리아 케챱 도둑" 
+           value="{{ username }}" maxlength="10" required>
             {% if response %}
             <p style = 'color: red;'>{{response}}</p>
             {% else %}

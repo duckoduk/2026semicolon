@@ -13,6 +13,25 @@ body{
 body::-webkit-scrollbar {
     display: none;
 }
+
+input[type="number"], input[type="password"]{
+    background-color: #EFF7FF;
+    border: #EFF7FF;
+    border-radius: 10px;
+    color: #8BB6F5;
+    font-size: 15px;
+    width: 85%;
+    padding: 20px
+}
+
+input[type='number']:focus,
+    input[type='text']:focus,
+    input[type="password"]:focus{
+        border: #0089ED;
+        box-shadow: 0 0 10px rgba(0, 137, 237, 0.2);
+        outline: none;
+    }
+
 @media screen and (max-width: 800px) {
     .header{
         display: block;
@@ -43,6 +62,16 @@ body::-webkit-scrollbar {
         width: 85%;
         padding: 20px
     }
+    input[type="number"], input[type="password"]{
+        background-color: #EFF7FF;
+        border: #EFF7FF;
+        border-radius: 10px;
+        color: #8BB6F5;
+        font-size: 15px;
+        width: 85%;
+        padding: 20px
+    }
+    input[type='number']:focus,
     input[type='text']:focus,
     input[type="password"]:focus{
         border: #0089ED;
