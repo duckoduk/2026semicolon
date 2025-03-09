@@ -14,7 +14,7 @@
         {% for i in range(clubs | length) %}
         <section class="stock-card">
             <div class="stock-info">
-                <img class="club_logo" src="/static/images/logos/semicolon.png" alt="logo">
+                <img src="{{ url_for('static', filename='images/logos/{}로고.jpg'.format(clubs[i])) }}" alt="{{ clubs[i] }} 로고" class="club_logo">
                 <div class="text-container">
                     <p class="club-name">{{ clubs[i] }}</p>
                     <p class="price">{{ club_price[i+2] }}₩</p>
