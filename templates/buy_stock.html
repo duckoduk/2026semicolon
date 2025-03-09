@@ -13,7 +13,7 @@
     {% include "navbar/topnav.html" %}
     <div class="container">
         <div class="details">
-            <img src="{{ url_for('static', filename='images/logos/{}로고.jpg'.format(club)) }}" alt="{{ club }} 로고" class="club_logo">
+            <img src="{{ url_for('static', filename='images/logos/{}로고.jpg'.format(club)) }}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/logos/고양이.jpg') }}';" class="club_logo" width="30px">
             <div class="info">
                 <h1>{{ club }}</h1>
                 <div class="tags">

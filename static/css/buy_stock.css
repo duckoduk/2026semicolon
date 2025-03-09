@@ -29,8 +29,8 @@ body::-webkit-scrollbar {
     }
     
     .club_logo {
-        width: 150px;
-        height: 150px;
+        width: 60px !important; /* 강제 적용 */
+        width: 60px !important; /* 강제 적용 */
         margin-right: 20px;  /* 이미지와 텍스트 사이 간격 */
         background-image: url("/static/images/semicolon logo.png");
         background-size: contain;
@@ -69,6 +69,8 @@ body::-webkit-scrollbar {
         flex-wrap: wrap; /* 반응형 아이템 배치 */
         justify-content: center; /* 내부 요소 가운데 정렬 */
         box-sizing: border-box; /* padding 포함한 크기 계산 */
+        align-items: center;
+        flex-direction: column;
     }
     .poster{
         display: flex;
@@ -80,6 +82,8 @@ body::-webkit-scrollbar {
         border-radius: 8%;
     
     }
+    
+    
     
 }
 
