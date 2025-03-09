@@ -51,6 +51,13 @@ tbody tr:hover {
     background-color: #f9f9f9; /* 마우스 호버 시 강조 효과 */
 }
 
+.ranking-pfp {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
 @media screen and (max-width:800px){
     section {
         display: flex;            
