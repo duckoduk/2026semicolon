@@ -138,10 +138,10 @@ def dashboard():
         total_assets = supabase.table('user_data').select('total_assets').eq('user_id', session['user_id']).execute() #user_data 테이블의 total_assets 열 중 user_id가 session['user_id']인 행을 가져옴
         stock_data = supabase.table('user_data').select('*').eq('user_id', session['user_id']).execute()
         stock_price_data = supabase.table('stock_data').select('*').order('id', desc=True).limit(1).execute()
-        stock = list(stock_data.data[0].keys() if stock_data.data else [])[4:44]
-        stock_num = list(stock_data.data[0].values() if stock_data.data else [])[4:44]
+        stock = list(stock_data.data[0].keys() if stock_data.data else [])[4:38]
+        stock_num = list(stock_data.data[0].values() if stock_data.data else [])[4:38]
         stock_price=list(stock_price_data.data[0].values() if stock_price_data.data else [])[2:]
-        average_price = list(stock_data.data[0].values() if stock_data.data else [])[44:]
+        average_price = list(stock_data.data[0].values() if stock_data.data else [])[38:]
         profit_value = [profit_rate(stock_price[i], average_price[i]) for i in range(len(stock_price))]  # 수익률 계산
         # Supabase에서 해당 사용자의 pfp 값 가져오기
         response = supabase_client.table("users").select("pfp").eq("username", session['username']).execute()
@@ -205,10 +205,10 @@ def home():
     total_assets = supabase.table('user_data').select('total_assets').eq('user_id', session['user_id']).execute() #user_data 테이블의 total_assets 열 중 user_id가 session['user_id']인 행을 가져옴
     stock_data = supabase.table('user_data').select('*').eq('user_id', session['user_id']).execute()
     stock_price_data = supabase.table('stock_data').select('*').order('id', desc=True).limit(1).execute()
-    stock = list(stock_data.data[0].keys() if stock_data.data else [])[4:44]
-    stock_num = list(stock_data.data[0].values() if stock_data.data else [])[4:44]
+    stock = list(stock_data.data[0].keys() if stock_data.data else [])[4:38]
+    stock_num = list(stock_data.data[0].values() if stock_data.data else [])[4:38]
     stock_price=list(stock_price_data.data[0].values() if stock_price_data.data else [])[2:]
-    average_price = list(stock_data.data[0].values() if stock_data.data else [])[44:]
+    average_price = list(stock_data.data[0].values() if stock_data.data else [])[38:]
     profit_value = [profit_rate(stock_price[i], average_price[i]) for i in range(len(stock_price))]  # 수익률 계산
     # Supabase에서 해당 사용자의 pfp 값 가져오기
     response = supabase_client.table("users").select("pfp").eq("username", session['username']).execute()
