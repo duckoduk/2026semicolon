@@ -248,7 +248,7 @@ def process_buy_stock():
     try:
         amount = int(amount_str)
     except ValueError:
-        return jsonify({"구매 수량은 숫자여야 합니다."}), 400
+        return jsonify({"error":"구매 수량은 숫자여야 합니다."}), 400
 
     # stock_data 테이블에서 최신 주식 가격 조회
     response = supabase.table('stock_data') \
@@ -257,23 +257,23 @@ def process_buy_stock():
                        .limit(1) \
                        .execute()
     if not response.data:
-        return jsonify({"최신 주식 데이터가 없습니다."}), 400
+        return jsonify({"error":"최신 주식 데이터가 없습니다."}), 400
 
     recent_data = response.data[0]
     if club not in recent_data:
-        return jsonify({f"주식 데이터에 '{club}' 클럽 정보가 없습니다."}), 400
+        return jsonify({"error":f"주식 데이터에 '{club}' 클럽 정보가 없습니다."}), 400
 
     try:
         price = float(recent_data[club])
     except ValueError:
-        return jsonify({f"주식 가격 데이터에 오류가 있습니다."}), 400
+        return jsonify({"error":"주식 가격 데이터에 오류가 있습니다."}), 400
 
     total_cost = price * amount
 
     # 세션에서 로그인된 사용자의 user_id 가져오기
     user_id = session.get('user_id')
     if not user_id:
-        return jsonify({f"로그인된 사용자가 없습니다."}), 401
+        return jsonify({"error":"로그인된 사용자가 없습니다."}), 401
 
     # user_data 테이블에서 user_id로 사용자 데이터 조회
     user_response = supabase.table('user_data') \
@@ -281,26 +281,26 @@ def process_buy_stock():
                             .eq("user_id", user_id) \
                             .execute()
     if not user_response.data:
-        return jsonify({f"사용자 데이터를 찾을 수 없습니다."}), 404
+        return jsonify({"error":"사용자 데이터를 찾을 수 없습니다."}), 404
 
     user_data = user_response.data[0]
     try:
         current_balance = float(user_data['balance'])
     except ValueError:
-        return jsonify({f"계좌 잔액 데이터 오류"}), 400
+        return jsonify({"error":"계좌 잔액 데이터 오류"}), 400
     
     try:
         current_amount = int(user_data[club])
     except ValueError:
-        return jsonify({f"주식 보유량 데이터 오류"}), 400
+        return jsonify({"error":"주식 보유량 데이터 오류"}), 400
 
     if current_balance < total_cost:
-        return jsonify({f"잔액이 부족합니다."}), 400
+        return jsonify({"error":"잔액이 부족합니다."}), 400
     
     try:
         average_cost = float(user_data[club+'_평균구매가'])
     except ValueError:
-        return jsonify({f"평균 매수가 데이터 오류"}), 400
+        return jsonify({"error":"평균 매수가 데이터 오류"}), 400
 
     if trade=="buy":
         # 잔액 차감 및 해당 클럽의 보유 주식 수 업데이트
@@ -320,12 +320,11 @@ def process_buy_stock():
                                 .eq("user_id", user_id) \
                                 .execute()
         
-        print(f"매수 성공: '{club}' 주식 {amount}주를 {total_cost}원에 매수하였습니다.")
         return jsonify({"message": f"매수 성공: '{club}' 주식 {amount}주를 {total_cost}원에 매수하였습니다."})
     
     else: #trade ==sell
         if int(user_data.get(club, 0)) < amount:
-            return jsonify({"보유 주식이 부족합니다."}), 400  # 매도 수량 검증 추가
+            return jsonify({"error":"보유 주식이 부족합니다."}), 400  # 매도 수량 검증 추가
         # 잔액 차감 및 해당 클럽의 보유 주식 수 업데이트
         new_balance = current_balance + total_cost
         current_stock = int(user_data.get(club, 0))
@@ -392,23 +391,8 @@ def my_page():
         .execute()
     recent_row = response.data[0] if response.data else None
     older_row = response.data[1] if response.data else None
-    print('recent_row')
-    print(recent_row)
-    print('older_row') 
-    print(older_row)
-    print(len(recent_row), len(older_row))
-    profit_value = [
-    profit_rate(
-        int(recent_row.get(club, 0) or 0), 
-        int(older_row.get(club, 0) or 0)
-    ) if older_row else 0.00 
-    for club in clubs
-]
-
-    print('profit_value')
-    print(profit_value)
+    profit_value = [profit_rate(int(recent_row.get(club, 0) or 0),int(older_row.get(club, 0) or 0)) if older_row else 0.00 for club in clubs]
     color = ['red' if profit_value[i] > 0 else 'blue' for i in range(len(profit_value))]
-
     return render_template('main_stock.html', username=session['username'], clubs=clubs, club_price=club_price, profit_value=profit_value,color=color)
 
 
@@ -465,16 +449,16 @@ def update_pfp():
     pfp = data.get("pfp")  # 선택한 프로필 이미지 파일명 (Duck.png 또는 Unicorn.png)
 
     if not username or not pfp:
-        return jsonify({"error": "Missing username or pfp"}), 400
+        return jsonify({f"error": "Missing username or pfp"}), 400
 
     # Supabase에서 해당 사용자의 pfp 값을 업데이트
     response = supabase_client.table("users").update({"pfp": pfp}).eq("username", username).execute()
 
     # Supabase의 execute()는 (data, error) 튜플이 아닌 단일 객체를 반환하므로, 직접 확인
     if "error" in response and response["error"]:
-        return jsonify({"error": str(response["error"])}), 500
+        return jsonify({f"error": str(response["error"])}), 500
 
-    return jsonify({"message": "Profile picture updated successfully"})
+    return jsonify({f"message": "Profile picture updated successfully"})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
